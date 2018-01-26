@@ -1,0 +1,42 @@
+﻿IP over Avian Carriers
+
+
+Game description:
+        You are a pigeon enlisted into the IP over Avian Carriers program to provide internet to a remote (but inhabited) island. The messages are sent using the TCP (Transport by Carrier Pigeon) protocol. The aim of the game is to transmit messages between houses in the form of birdsong. The packet protocol used includes a decryption minigame to find the correct destination. Messages are given in the form of a musical sequence and a sequence of symbols. The player chooses the correct symbols from a selection at the other (receiving) end to complete the transmission.
+
+
+Winning the game:
+The game is a score attack game where the player is scored on the number of transmissions successfully completed within time limits as well as their accuracy of transmitted messages.
+
+
+Losing the game: 
+The game is lost if the player does not complete a transmission in time, gets lost (flies off the island), or delivers to the wrong place too many times. 
+
+
+Game Design:
+
+
+The game takes place in a top down view with side-on objects (akin to early top down RPGs such as the Legend of Zelda). The interior views for messages are of a side-on perspective.
+
+
+Gameplay:
+
+
+Overworld
+
+
+The player (pigeon) begins on a procedurally generated island. The island is split into a number of map segments (NxM map, see Map). Arrows on the sides of the screen show the player the nearest currently transmitting house. The player flies towards the nearest transmitting location and presses a button to enter the transmission screen.
+
+
+Transmission Screen
+
+
+The player is seen on the left (when picking up a message) or right (when transmitting a message) of the screen with a computer, router, switch, etc on the other side of said screen.
+When picking up a message, a sequence of musical notes is played. This has a complementary sequence of symbols in some form (to allow for the game to be played in noisy environments, easier remembering, people hard of hearing, etc). This message contains both the message to be delivered as well as an encoded set of directions for the house to be delivered to. After receiving the message, the player may repeat this sequence any number of times. After choosing to leave, a timer starts.
+The player then decodes the first part of the protocol containing the address of the destination using their journal. This maps sequences to specific houses within the world. The player begins to travel to the specific location. Along the way, multiple houses may begin to also transmit messages. It is up to the player as to whether they choose to deliver these messages at the same time. 
+When the destination house has been located, the player uses the same controls to enter the house and begin transmitting their message. The player has a number of options to press. Each of these has a corresponding symbol and produces a sound on hover-over. The player presses these in sequence to finish transmitting the message. The player is rewarded with points for a successful message or penalised if the wrong house was chosen.
+
+Journal Screen:
+The journal includes a set of translations for the receiving part of the protocol. For instance, a sequence AGR (nb: sequences probably not in english letters) may correspond to a house with a red roof in map section (3, 4). 
+The map provides an overview of the island labelled in map cell coordinates. As the player has no inherent way to tell where in the island they are, they must use landmarks to orient themselves within the island.
+
