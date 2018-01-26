@@ -31,6 +31,8 @@ class Game:
         while not self.done:
             self.screen.blit(self.map, (self.player.worldX, self.player.worldY))
             pygame.draw.rect(self.screen, 255, self.player.visual)
+            collision_visual = pygame.Rect((self.player.screenX - self.player.worldX, self.player.screenY - self.player.worldY, 10, 10))
+            pygame.draw.rect(self.screen, 255, collision_visual)
 
             pressed_keys = pygame.key.get_pressed()
 
