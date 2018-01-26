@@ -1,5 +1,5 @@
 import pygame
-from gamejam2018 import main as main
+import main
 
 screen = pygame.display.set_mode((640, 480))
 
