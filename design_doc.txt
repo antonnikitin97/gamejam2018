@@ -40,3 +40,10 @@ Journal Screen:
 The journal includes a set of translations for the receiving part of the protocol. For instance, a sequence AGR (nb: sequences probably not in english letters) may correspond to a house with a red roof in map section (3, 4). 
 The map provides an overview of the island labelled in map cell coordinates. As the player has no inherent way to tell where in the island they are, they must use landmarks to orient themselves within the island.
 
+
+Evolution of game complexity:
+The initial transmissions are short messages, however messages become later as the game progresses. The time allowed for delivering messages also decreases.
+
+Potential extensions:
+More mechanics added into the protocol - for instance headers that require specific decoded responses at the receiving end
+
