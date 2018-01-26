@@ -1,9 +1,7 @@
-import sys
-import pygame
+import sys, pygame
 from pygame.locals import *
 
 class Player:
-
     def __init__(self, x, y):
         self.worldX = 0
         self.worldY = 0
@@ -13,16 +11,12 @@ class Player:
 
 
 class Game:
-
-
-
-    def __init__(self):
-        pygame.init()
+    def __init__(self, screen):
+        self.screen = screen
         self.done = False
-        self.dimensionX = 640
-        self.dimensionY = 480
+        self.dimensionX = screen.get_width()
+        self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.screen = pygame.display.set_mode(self.screen_dimensions)
 
         self.map = pygame.image.load('Assets\GameJam\map.jpg')
         self.player = Player(self.dimensionX, self.dimensionY)
@@ -50,7 +44,3 @@ class Game:
                     self.done = True
 
             pygame.display.flip()
-
-
-game = Game()
-game.main_loop()
