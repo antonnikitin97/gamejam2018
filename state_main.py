@@ -5,6 +5,7 @@ from house import House
 import state_house
 from house_generator import *
 from entity import Entity
+import StateMachine
 
 class Player:
     def __init__(self, x, y):
@@ -126,5 +127,4 @@ class Game:
             pygame.display.flip()
         return self.nextstate
 
-import StateMachine
 StateMachine.run()
