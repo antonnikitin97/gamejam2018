@@ -1,6 +1,6 @@
 import sys, pygame
 from pygame.locals import *
-import gameover
+import state_gameover
 
 class Player:
     def __init__(self, x, y):
@@ -24,7 +24,7 @@ class Game:
         self.player = Player(self.dimensionX, self.dimensionY)
     
     def endgame(self, victory):
-        self.nextstate = gameover.EndScreen(self.screen, victory, -1234567890)
+        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
         self.done = True
 
     def main_loop(self):

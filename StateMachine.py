@@ -1,10 +1,10 @@
 import pygame
-import menu
+import state_menu
 pygame.init()
 
 screen = pygame.display.set_mode((640, 480))
 
-menustate = menu.Menu(screen)
+menustate = state_menu.Menu(screen)
 
 state = menustate
 
