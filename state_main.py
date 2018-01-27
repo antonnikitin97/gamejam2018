@@ -4,7 +4,7 @@ import state_gameover
 from house import House
 import state_house
 from house_generator import *
-
+from entity import Entity
 
 class Player:
     def __init__(self, x, y):
@@ -50,6 +50,7 @@ class Player:
 
 class Game:
     def __init__(self, screen):
+        pygame.font.init()
         self.screen = screen
         self.done = False
         self.nextstate = None
@@ -61,6 +62,8 @@ class Game:
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
         self.generate_house_locations()
+        self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
+
     
     def endgame(self, victory):
         self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
@@ -76,7 +79,7 @@ class Game:
         self.done = False
         while not self.done:
             self.screen.fill((38, 142, 143))
-            self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY  + self.dimensionY/2))
+            self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY + self.dimensionY/2))
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             #wtf is this collision thing 
             #it's not right
@@ -90,13 +93,19 @@ class Game:
 
                 house.visual.x = object_screen_x
                 house.visual.y = object_screen_y
+
                 #pygame.draw.rect(self.screen, 255, house.visual)
                 self.screen.blit(self.house, house.visual)
+
+                if house.visual.colliderect(self.player.visual):
+                    text_surface = self.my_font.render('Press G to enter the house! :)', False, (255, 255, 255))
+                    self.screen.blit(text_surface, (20, 20))
+
             self.screen.blit(self.player.get_sprite(), self.player.visual)
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
-            
+
 
             for event in pygame.event.get():
                 if event.type == QUIT:
