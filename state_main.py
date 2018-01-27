@@ -65,7 +65,7 @@ class Game:
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
         self.generate_house_locations()
-        self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
+        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         self.danger = False
 
     
@@ -81,6 +81,8 @@ class Game:
 
     def main_loop(self):
         self.done = False
+        WHITE = (255, 255, 255)
+        BLACK = (0, 0, 0)
         while not self.done:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY + self.dimensionY/2))
@@ -106,13 +108,14 @@ class Game:
                 color_pixel = self.screen.get_at((int(self.player.visual.centerx), int(self.player.visual.centery)))
                 print("Color blue: " + str(color_pixel.b))
 
-                if color_pixel.b > 142 and color_pixel.r < 254 and color_pixel.g < 254:
+                if color_pixel.r == 38 and color_pixel.g == 142 and color_pixel.b == 143:
                     self.danger = True
-                    text_surface = self.my_font.render('DANGER!', False, (255, 255, 255))
+                    text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK)
                     self.screen.blit(text_surface, (20,20))
-
+            
+            for house in self.house_list:
                 if house.visual.colliderect(self.player.visual):
-                    text_surface = self.my_font.render('Press G to enter the house! :)', False, (255, 255, 255))
+                    text_surface = self.textfont.render('Press G to enter the house! :)', False, WHITE, BLACK)
                     self.screen.blit(text_surface, (20, 20))
             self.screen.blit(self.player.get_sprite(), self.player.visual)
             #pygame.draw.rect(self.screen, 255, self.player.visual)
