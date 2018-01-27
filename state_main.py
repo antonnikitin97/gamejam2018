@@ -23,11 +23,14 @@ class Player:
         self.neimg = pygame.transform.rotate(self.up_img, 315)
         self.seimg = pygame.transform.rotate(self.up_img, 225)
         self.visual = pygame.Rect((self.screenX, self.screenY, 204, 152))
-        self.collision = pygame.Rect((self.screenX, self.screenY, 204, 152))
+        self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
+    
     def get_sprite(self):
         li = [self.img, self.down_img, self.right_img, self.up_img, self.nwimg, self.swimg, self.neimg, self.seimg]
         return li[self.orient]
+    
     def move(self, pressed_keys):
+        self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
         if pressed_keys[K_DOWN]:
                 self.worldY += self.speed
                 self.orient = 1
@@ -51,7 +54,6 @@ class Player:
 
 
 class Game:
-
     def __init__(self, screen):
         pygame.font.init()
         self.screen = screen

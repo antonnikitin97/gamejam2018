@@ -5,6 +5,7 @@ import pygame
 import state_main
 import copy
 from pygame.locals import *
+
 TRANSMISSION_EVENT = 10000
 num_houses = 15
 sound_endevent = pygame.event.Event(TRANSMISSION_EVENT)
@@ -36,10 +37,10 @@ class HouseScreen:
         self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
         self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
-        self.collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
+        self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
+        self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
-
 
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
@@ -47,8 +48,9 @@ class HouseScreen:
     def load_symbols(self):
         scale_const = 0.4
         imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png') for i in range(1, 20)]
-        return [pygame.transform.scale(img, (int(img.get_width()*scale_const), int(img.get_height()*scale_const))) for img in imgs]
-
+        return [pygame.transform.scale(img, (int(img.get_width() * scale_const),
+                                             int(img.get_height() * scale_const))) for img in imgs]
+    
     #TODO: each location should make a unique triplet or so from its id
     def get_location_encoding(self, id):
         return [10, 8]
@@ -98,7 +100,6 @@ class HouseScreen:
         print(self.noises)
         self.display_next_sequence()
 
-
     def display_next_sequence(self):
         if len(self.waiting_sounds) == 0:
             return
@@ -109,33 +110,39 @@ class HouseScreen:
         
         self.current_channel.play(self.noises[element])
         self.transmission.append(e)
+        
+    def leavehouse(self):
+        self.nextstate = self.overworld
+        self.done = True
 
     def main_loop(self):
         chan = None
-        self.player2.worldX = 0
-        self.player2.worldY = 0
+        self.player2.worldX = 400
+        self.player2.worldY = 400
         while not self.done:
             pressed_keys = pygame.key.get_pressed()
             self.player2.move(pressed_keys)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
-            pygame.draw.rect(self.screen, 255, self.collider)
-            if self.collider.contains(self.player2.collision):
-                self.screen.blit(self.player2.get_sprite(), (400 + self.player2.worldX, 400 + self.player2.worldY))
+            pygame.draw.rect(self.screen, 255, self.bounding_collider)
+            pygame.draw.rect(self.screen, 255, self.doormat_collider)
+            if self.bounding_collider.contains(self.player2.collision):
+                self.screen.blit(self.player2.get_sprite(), (self.player2.worldX, self.player2.worldY))
             offs = 0
             for i in range(len(self.transmission)):
                 self.screen.blit(self.transmission[i], (transmission_offset + offs, transmission_offset))
                 offs += self.transmission[i].get_width() + 5
+            if self.doormat_collider.colliderect(self.player2.collision):
+                self.leavehouse()
             for event in pygame.event.get():
                 if event.type == QUIT:
                     exit()
                 if event.type == KEYDOWN:
                     if event.key == K_q:
                         if not len(self.waiting_sounds):
-                                chan = self.start_receiving_transmission()
+                            chan = self.start_receiving_transmission()
                     if event.key == K_w:
-                        self.nextstate = self.overworld
-                        self.done = True
+                        self.leavehouse()
 
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
                 print('aaaaa')
