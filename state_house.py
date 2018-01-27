@@ -3,6 +3,7 @@ import random
 import time
 import pygame
 import state_main
+import copy
 from pygame.locals import *
 TRANSMISSION_EVENT = 10000
 num_houses = 15
@@ -36,10 +37,9 @@ class HouseScreen:
         self.transmission = []
         self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
         self.overworld = overworld
-        self.player = overworld.player
-        #TODO: you'll have to make a copy of the player but fiddle the movement so you don't move the camera and instead move the player
-        #idk it's 6:30am and I'm tired
-        
+        self.player2 = copy.copy(overworld.player)
+
+
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
 
@@ -111,10 +111,14 @@ class HouseScreen:
 
     def main_loop(self):
         chan = None
+        self.player2.worldX = 0
+        self.player2.worldY = 0
         while not self.done:
+            pressed_keys = pygame.key.get_pressed()
+            self.player2.move(pressed_keys)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
-            self.screen.blit(self.player.get_sprite(), (400, 400))
+            self.screen.blit(self.player2.get_sprite(), (400 + self.player2.worldX , 400 + self.player2.worldY))
             offs = 0
             for i in range(len(self.transmission)):
                 self.screen.blit(self.transmission[i], (transmission_offset + offs, transmission_offset))
@@ -128,7 +132,8 @@ class HouseScreen:
                                 chan = self.start_receiving_transmission()
                     if event.key == K_UP:
                         self.nextstate = self.overworld
-                        self.done = True            
+                        self.done = True
+
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
                 print('aaaaa')
                 self.display_next_sequence()
