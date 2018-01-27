@@ -25,7 +25,7 @@ def distance(a, b):
 
 island_radius = 1250
 n_houses = 20
-min_house_dist = 200
+min_house_dist = 400
 
 def play_music(music_file):
     """
@@ -56,11 +56,13 @@ def generate_house_locations():
 			if (loc.x - island_radius/2)**2 + (loc.y- island_radius/2)**2 > island_radius**2:
 				print('out of circle')
 				continue #out of the circle radius
+			loc = Point(loc.x + island_radius, loc.y + island_radius)
 			for house in list_houses:
 				if distance(loc, house) < min_house_dist:
 					print('too close')
 					continue
-			loc = Point(loc.x + island_radius, loc.y + island_radius)
+				print(distance(loc, house))
+			
 			list_houses.append(loc)
 			break
 	print(list_houses)

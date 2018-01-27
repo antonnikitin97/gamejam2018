@@ -2,18 +2,19 @@ import sys, pygame
 from pygame.locals import *
 import state_gameover
 from house import House
+import state_house
 from house_generator import *
 
 
 class Player:
     def __init__(self, x, y):
+        self.img = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\flyspritefill.png'), (204, 152))
         self.worldX = x / 2
         self.worldY = y / 2
-        self.screenX = x / 2
-        self.screenY = y / 2
+        self.screenX = self.worldX
+        self.screenY = self.worldY
         self.speed = 10
         self.orient = 0
-        self.img = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\flyspritefill.png'), (204, 152))
         self.down_img = pygame.transform.rotate(self.img, 90)
         self.right_img = pygame.transform.flip(self.img, True, False)
         self.up_img = pygame.transform.flip(self.down_img, False, True)
@@ -62,13 +63,15 @@ class Game:
             #pygame.draw.rect(self.screen, 255, collision_visual)
 
             for house in self.house_list:
-                object_screen_x = house.worldX - self.player.worldX + (self.dimensionX / 2) - house.size/2
-                object_screen_y = house.worldY - self.player.worldY + (self.dimensionY / 2) - house.size/2
+                object_screen_x = house.worldX - self.player.worldX + (self.dimensionX / 2) - house.visual.width/2
+                object_screen_y = house.worldY - self.player.worldY + (self.dimensionY / 2) - house.visual.height/2
 
                 house.visual.x = object_screen_x
                 house.visual.y = object_screen_y
+                #pygame.draw.rect(self.screen, 255, house.visual)
                 self.screen.blit(self.house, house.visual)
             self.screen.blit(self.player.get_sprite(), self.player.visual)
+            #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
 
             if pressed_keys[K_DOWN]:
@@ -103,6 +106,11 @@ class Game:
                     if event.key == K_2:
                         # temporary victory function
                         self.endgame(True)
+                    if event.key == K_g:
+                        for house in self.house_list:
+                            if house.visual.colliderect(self.player.visual):
+                                self.done = True
+                                self.nextstate = state_house.HouseScreen(self.screen, self)
 
             pygame.display.flip()
         return self.nextstate
