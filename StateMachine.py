@@ -20,9 +20,9 @@ def fadeout():
 		for ev in pygame.event.get():
 				if ev.type == QUIT:
 					DONE = True
-		print(alph)
+		#print(alph)
 		if alph > 10:
-			DONE = True
+			break
 		pygame.display.flip() # Flip the whole screen at each frame.
 
 def run():

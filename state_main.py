@@ -26,6 +26,27 @@ class Player:
     def get_sprite(self):
         li = [self.img, self.down_img, self.right_img, self.up_img, self.nwimg, self.swimg, self.neimg, self.seimg]
         return li[self.orient]
+    def move(self, pressed_keys):
+        if pressed_keys[K_DOWN]:
+                self.worldY += self.speed
+                self.orient = 1
+        if pressed_keys[K_UP]:
+            self.worldY -= self.speed
+            self.orient = 3
+        if pressed_keys[K_LEFT]:
+            self.worldX -= self.speed
+            self.orient = 0
+            if pressed_keys[K_UP]:
+                self.orient = 4
+            if pressed_keys[K_DOWN]:
+                self.orient = 5
+        if pressed_keys[K_RIGHT]:
+            self.worldX += self.speed
+            self.orient = 2
+            if pressed_keys[K_UP]:
+                self.orient = 6
+            if pressed_keys[K_DOWN]:
+                self.orient = 7
 
 class Game:
     def __init__(self, screen):
@@ -39,6 +60,7 @@ class Game:
         self.house = pygame.image.load_extended('Assets\\GameJam\\house.png')
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
+        self.generate_house_locations()
     
     def endgame(self, victory):
         self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
@@ -51,7 +73,7 @@ class Game:
             self.house_list.append(House(*tuple))
 
     def main_loop(self):
-        self.generate_house_locations()
+        self.done = False
         while not self.done:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY  + self.dimensionY/2))
@@ -73,28 +95,8 @@ class Game:
             self.screen.blit(self.player.get_sprite(), self.player.visual)
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
-
-            if pressed_keys[K_DOWN]:
-                self.player.worldY += self.player.speed
-                self.player.orient = 1
-            if pressed_keys[K_UP]:
-                self.player.worldY -= self.player.speed
-                self.player.orient = 3
-            if pressed_keys[K_LEFT]:
-                self.player.worldX -= self.player.speed
-                self.player.orient = 0
-                if pressed_keys[K_UP]:
-                    self.player.orient = 4
-                if pressed_keys[K_DOWN]:
-                    self.player.orient = 5
-            if pressed_keys[K_RIGHT]:
-                self.player.worldX += self.player.speed
-                self.player.orient = 2
-                if pressed_keys[K_UP]:
-                    self.player.orient = 6
-                if pressed_keys[K_DOWN]:
-                    self.player.orient = 7
-                print(self.player.worldX, self.player.worldY)
+            self.player.move(pressed_keys)
+            
 
             for event in pygame.event.get():
                 if event.type == QUIT:

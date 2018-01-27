@@ -2,6 +2,7 @@ from random import randint
 import random
 import time
 import pygame
+import state_main
 from pygame.locals import *
 TRANSMISSION_EVENT = 10000
 num_houses = 15
@@ -34,6 +35,10 @@ class HouseScreen:
         self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
         self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
+        self.overworld = overworld
+        self.player = overworld.player
+        #TODO: you'll have to make a copy of the player but fiddle the movement so you don't move the camera and instead move the player
+        #idk it's 6:30am and I'm tired
         
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
@@ -109,6 +114,7 @@ class HouseScreen:
         while not self.done:
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
+            self.screen.blit(self.player.get_sprite(), (400, 400))
             offs = 0
             for i in range(len(self.transmission)):
                 self.screen.blit(self.transmission[i], (transmission_offset + offs, transmission_offset))
