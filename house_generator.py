@@ -23,9 +23,9 @@ p2 = Point(1, 0)
 def distance(a, b):
     return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
 
-island_radius = 1000
+island_radius = 1250
 n_houses = 20
-min_house_dist = 0.01
+min_house_dist = 200
 
 def play_music(music_file):
     """
@@ -52,7 +52,7 @@ def generate_house_locations():
 		#generate a house
 		while iter_num < 1000:
 			iter_num += 1
-			loc = Point(random.randint(0, island_radius), random.randint(0, island_radius))
+			loc = Point(random.randint(-island_radius, island_radius), random.randint(-island_radius, island_radius))
 			if (loc.x - island_radius/2)**2 + (loc.y- island_radius/2)**2 > island_radius**2:
 				print('out of circle')
 				continue #out of the circle radius
@@ -60,8 +60,8 @@ def generate_house_locations():
 				if distance(loc, house) < min_house_dist:
 					print('too close')
 					continue
+			loc = Point(loc.x + island_radius, loc.y + island_radius)
 			list_houses.append(loc)
-			print('it worked')
 			break
 	print(list_houses)
 	return list_houses
