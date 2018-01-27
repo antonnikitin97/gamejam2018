@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-import state_main
+import state_main, state_house
 from button import Button
 
 
@@ -24,7 +24,7 @@ class Menu:
         self.selectedbutton = -1
         
     def startgame(self):
-        self.nextstate = state_main.Game(self.screen)
+        self.nextstate = state_house.HouseScreen(self.screen, 0)#state_main.Game(self.screen)
         self.done = True
     
     def enteroptions(self):
