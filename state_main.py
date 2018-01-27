@@ -1,6 +1,6 @@
 import sys, pygame
 from pygame.locals import *
-import state_gameover
+from state_gameover import EndScreen
 from house import House
 import state_house
 from house_generator import *
@@ -16,7 +16,7 @@ class Player:
         self.screenY = self.worldY
         self.speed = 10
         self.orient = 0
-        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Bird Frame {}.png'.format(i)), (204, 152)) for i in range(1, 6)]
+        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)), (204, 152)) for i in range(1, 6)]
         down_img = [pygame.transform.rotate(img[i], 90)for i in range(len(img))]
         right_img = [pygame.transform.flip(img[i], True, False) for i in range(len(img))]
         up_img = [pygame.transform.flip(down_img[i], False, True) for i in range(len(img))]
@@ -80,8 +80,8 @@ class Game:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\GameJam\World map.png'), (3000, 2550))
-        self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Exterior.png'),
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\Images\World map.png'), (3000, 2550))
+        self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
                                             (int(898/5), int(876/5)))
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
@@ -106,7 +106,10 @@ class Game:
         return temp_point
 
     def generate_house_locations(self):
-        valid_points = generate_house_locations()
+        valid_points = generate_house_locations(self.house,
+                                                self.map.get_width()/2, self.map.get_height()/2,
+                                                min(self.map.get_width(), self.map.get_height())/2,
+                                                10)
         for i, house in enumerate(valid_points):
             tuple = (house.x, house.y)
             self.house_list.append(House(*tuple, self.house))
@@ -119,7 +122,7 @@ class Game:
             self.house_states.append(state_house.HouseScreen(self.screen, self, i))
     
     def endgame(self, victory):
-        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
+        self.nextstate = EndScreen(self.screen, victory, -1234567890)
         self.done = True
     
     def enterhouse(self, which):

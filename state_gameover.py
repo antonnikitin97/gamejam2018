@@ -17,12 +17,12 @@ class EndScreen:
         WHITE = (255, 255, 255)
         textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
         if victory:
-            self.stamp = pygame.image.load_extended('Assets/GameJam/Bird Flying.png')  # Standin image
+            self.stamp = pygame.image.load_extended('Assets/Images/Bird Frame 1.png')  # Standin image
             self.scorestatement = [textfont.render("GOOD JOB, FINE AVIAN", True, BLACK, WHITE),
                                    textfont.render("", True, BLACK, WHITE),
                                    textfont.render(str(points), True, BLACK, WHITE)]
         else:
-            self.stamp = pygame.image.load_extended('Assets/GameJam/Bird standing.png') # Standin image
+            self.stamp = pygame.image.load_extended('Assets/Images/Bird standing.png') # Standin image
             self.scorestatement = [textfont.render("404 ERROR:", True, BLACK, WHITE),
                                    textfont.render("BIRD NOT FOUND", True, BLACK, WHITE),
                                    textfont.render(str(points), True, BLACK, WHITE)]
