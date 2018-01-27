@@ -91,7 +91,10 @@ class Game:
         self.danger = False
 
     def generate_house_locations(self):
-        valid_points = generate_house_locations()
+        valid_points = generate_house_locations(self.house,
+                                                self.map.get_width()/2, self.map.get_height()/2,
+                                                min(self.map.get_width(), self.map.get_height())/2,
+                                                10)
         for i, house in enumerate(valid_points):
             tuple = (house.x, house.y)
             self.house_list.append(House(*tuple, self.house))

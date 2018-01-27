@@ -23,9 +23,6 @@ p2 = Point(1, 0)
 def distance(a, b):
     return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
 
-island_radius = 1250
-n_houses = 20
-min_house_dist = 400
 
 def play_music(music_file):
     """
@@ -45,31 +42,32 @@ def play_music(music_file):
         clock.tick(50)
 
 
-def generate_house_locations():
-	list_houses = []
-	iter_num = 0
-	for i in range(n_houses):
-		#generate a house
-		while iter_num < 1000:
-			iter_num += 1
-			loc = Point(random.randint(-island_radius, island_radius), random.randint(-island_radius, island_radius))
-			if (loc.x - island_radius/2)**2 + (loc.y- island_radius/2)**2 > island_radius**2:
-				print('out of circle')
-				continue #out of the circle radius
-			loc = Point(loc.x + island_radius, loc.y + island_radius)
-			for house in list_houses:
-				if distance(loc, house) < min_house_dist:
-					print('too close')
-					continue
-				print(distance(loc, house))
-			
-			list_houses.append(loc)
-			break
-	print(list_houses)
-	return list_houses
+def generate_house_locations(housesprite, islecentrex, islecentrey, islerad, n_houses=20):
+    min_house_dist = max(housesprite.get_width(), housesprite.get_height())
+    list_houses = []
+    for i in range(n_houses):
+        #generate a house
+        while True:
+            loc = Point(random.randint(-islerad, islerad), random.randint(-islerad, islerad))
+            if distance(Point(0, 0), loc) > islerad:
+                print('out of circle')
+                continue #out of the circle radius
+            loc = Point(islecentrex + loc.x, islecentrey + loc.y)
+            isclear = True
+            for house in list_houses:
+                if distance(loc, house) < min_house_dist:
+                    print('too close')
+                    isclear = False
+                    break
+                print(distance(loc, house))
+            if isclear:
+                list_houses.append(loc)
+                break
+    print(list_houses)
+    return list_houses
 
 def get_location_encoding(place):
-		return [0, 3, 6]
+        return [0, 3, 6]
 
 #protocol:
 #header consisting of 0, 0
@@ -77,7 +75,7 @@ def get_location_encoding(place):
 #message consisting of len parts
 #end of message consisting of 0, 0
 def generate_IP_message(len, to):
-	return [0, 0] + get_location_encoding(to) + [int(random.random()*12) for _ in range(len+3)] + [0, 0]
+    return [0, 0] + get_location_encoding(to) + [int(random.random()*12) for _ in range(len+3)] + [0, 0]
 
 def music_seq(length):
 	#start on a random note
