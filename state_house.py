@@ -13,7 +13,6 @@ symbols = 0
 transmission_offset = 100
 class HouseScreen:
     def __init__(self, screen, overworld):
-        # self.collider = pygame.Rect((self.map.x, self.map.y, self.map.get_width(), self.map.get_height()))
         self.screen = screen
         self.done = False
         self.house = 1
@@ -37,6 +36,7 @@ class HouseScreen:
         self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
         self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
+        self.collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
 
@@ -119,7 +119,9 @@ class HouseScreen:
             self.player2.move(pressed_keys)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
-            self.screen.blit(self.player2.get_sprite(), (400 + self.player2.worldX , 400 + self.player2.worldY))
+            pygame.draw.rect(self.screen, 255, self.collider)
+            if self.collider.contains(self.player2.collision):
+                self.screen.blit(self.player2.get_sprite(), (400 + self.player2.worldX, 400 + self.player2.worldY))
             offs = 0
             for i in range(len(self.transmission)):
                 self.screen.blit(self.transmission[i], (transmission_offset + offs, transmission_offset))

@@ -84,7 +84,6 @@ class Game:
         while not self.done:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY + self.dimensionY/2))
-            # self.player.collision.x
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             #wtf is this collision thing 
             #it's not right
