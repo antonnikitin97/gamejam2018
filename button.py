@@ -7,7 +7,7 @@ class Button:
         self.y = y
         self.sprite = sprite
         self.highlitsprite = sprite.copy()
-        self.highlitsprite.fill((100, 255, 255, 20), special_flags=pygame.BLEND_RGBA_SUB)
+        self.highlitsprite.fill((100, 20, 255, 20), special_flags=pygame.BLEND_RGBA_SUB)
         self.collider = pygame.Rect(self.x - (self.sprite.get_width() / 2), self.y,
                                     sprite.get_width(), sprite.get_height())
         self.pressfunction = pressfunction
