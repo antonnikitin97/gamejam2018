@@ -3,9 +3,6 @@ from random import randint
 import random
 import pygame
 import time, numpy, pygame.mixer, pygame.sndarray
-from scipy.signal import resample
-import numpy as np
-import wave
 
 class Point:
     def __init__(self,x_init,y_init):
@@ -26,9 +23,9 @@ p2 = Point(1, 0)
 def distance(a, b):
     return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
 
-island_radius = 5000
+island_radius = 1000
 n_houses = 20
-min_house_dist = 200
+min_house_dist = 0.01
 
 def play_music(music_file):
     """
