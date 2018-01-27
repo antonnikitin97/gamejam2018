@@ -27,8 +27,8 @@ class Player:
                             nwimg, swimg, neimg, seimg]
         self.frame = 0
         self.lastspritechangetime = 0
-        self.visual = pygame.Rect((self.screenX, self.screenY, 204, 152))
-        self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
+        self.visual = pygame.Rect((self.screenX - 76, self.screenY - 76, 152, 152))
+        self.collision = pygame.Rect((self.worldX - 76, self.worldY - 76, 152, 152))
         self.projected_collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
     
     def get_sprite(self):
@@ -136,24 +136,30 @@ class Game:
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK)
                 self.screen.blit(text_surface, (20,20))
 
-            for house in self.house_list:
-                house.visual.x = house.worldX - self.player.worldX + (self.dimensionX + house.visual.width) / 2
-                house.visual.y = house.worldY - self.player.worldY + (self.dimensionY + house.visual.height) / 2
-                
-            housecollide = self.player.visual.collidelist([house.visual for house in self.house_list])
-            if housecollide != -1:
-                text_surface = self.textfont.render('Press G to enter house {}'.format(housecollide),
+            housecollide = [-1, self.dimensionX]
+            for i, house in enumerate(self.house_list):
+                house.visual.x = house.worldX - self.player.worldX + (self.dimensionX) / 2
+                house.visual.y = house.worldY - self.player.worldY + (self.dimensionY) / 2
+                #self.screen.fill(0, house.visual)
+                if self.player.visual.colliderect(house.visual):
+                    d = sqrt((self.player.worldX - house.worldX) ** 2 +
+                             (self.player.worldY - house.worldY) ** 2)
+                    if housecollide[1] > d:
+                        housecollide = [i, d]
+            if housecollide[0] != -1:
+                text_surface = self.textfont.render('Press G to enter house {}'.format(housecollide[0]),
                                                     False, WHITE, BLACK)
                 self.screen.blit(text_surface, (20, 20))
-                house = self.house_list[housecollide]
+                house = self.house_list[housecollide[0]]
                 arrowx = house.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width() + house.visual.width)/2
                 arrowy = house.worldY - self.player.worldY + 40 + (self.dimensionY - self.arrow.get_height() - house.visual.height)/2
                 self.screen.blit(self.arrow, (arrowx, arrowy))
                 if pygame.key.get_pressed()[K_g]:
-                    self.enterhouse(housecollide)
+                    self.enterhouse(housecollide[0])
             playersprite = self.player.get_sprite()
             self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
                                             (self.dimensionY - playersprite.get_height())/2))
+            #self.screen.fill(0, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
             
