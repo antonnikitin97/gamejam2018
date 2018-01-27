@@ -5,7 +5,6 @@ from house import House
 import state_house
 from house_generator import *
 from entity import Entity
-import StateMachine
 
 class Player:
     def __init__(self, x, y):
@@ -49,7 +48,9 @@ class Player:
             if pressed_keys[K_DOWN]:
                 self.orient = 7
 
+
 class Game:
+
     def __init__(self, screen):
         pygame.font.init()
         self.screen = screen
@@ -64,6 +65,7 @@ class Game:
         self.house_list = []
         self.generate_house_locations()
         self.my_font = pygame.font.SysFont('Comic Sans MS', 30)
+        self.danger = False
 
     
     def endgame(self, victory):
@@ -98,10 +100,19 @@ class Game:
                 #pygame.draw.rect(self.screen, 255, house.visual)
                 self.screen.blit(self.house, house.visual)
 
+                # if self.player.worldX - self.dimensionX / 2 >= 0 and self.player.worldX - self.dimensionX / 2 <= 640 and \
+                #         self.player.worldY - self.dimensionY / 2 >= 0 and self.player.worldY - self.dimensionY / 2 <= 480:
+                color_pixel = self.screen.get_at((int(self.player.visual.centerx), int(self.player.visual.centery)))
+                print("Color blue: " + str(color_pixel.b))
+
+                if color_pixel.b > 142 and color_pixel.r < 254 and color_pixel.g < 254:
+                    self.danger = True
+                    text_surface = self.my_font.render('DANGER!', False, (255, 255, 255))
+                    self.screen.blit(text_surface, (20,20))
+
                 if house.visual.colliderect(self.player.visual):
                     text_surface = self.my_font.render('Press G to enter the house! :)', False, (255, 255, 255))
                     self.screen.blit(text_surface, (20, 20))
-
             self.screen.blit(self.player.get_sprite(), self.player.visual)
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
@@ -127,4 +138,6 @@ class Game:
             pygame.display.flip()
         return self.nextstate
 
+
+import StateMachine
 StateMachine.run()

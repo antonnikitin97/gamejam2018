@@ -1,6 +1,7 @@
 import pygame
 import state_menu, state_main
 from pygame.locals import *
+from state_main import *
 
 screen = None
 
