@@ -125,8 +125,8 @@ class HouseScreen:
             self.player2.move(pressed_keys, self.bounding_collider)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
-            pygame.draw.rect(self.screen, 255, self.bounding_collider)
-            pygame.draw.rect(self.screen, 255, self.doormat_collider)
+            # pygame.draw.rect(self.screen, 255, self.bounding_collider)
+            # pygame.draw.rect(self.screen, 255, self.doormat_collider)
             if self.bounding_collider.contains(self.player2.collision):
                 self.screen.blit(self.player2.get_sprite(), (self.player2.worldX, self.player2.worldY))
             offs = 0
