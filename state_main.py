@@ -1,6 +1,6 @@
 import sys, pygame
 from pygame.locals import *
-import state_gameover
+from state_gameover import EndScreen
 from house import House
 import state_house
 from house_generator import *
@@ -107,7 +107,7 @@ class Game:
             self.house_states.append(state_house.HouseScreen(self.screen, self, i))
     
     def endgame(self, victory):
-        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
+        self.nextstate = EndScreen(self.screen, victory, -1234567890)
         self.done = True
     
     def enterhouse(self, which):
