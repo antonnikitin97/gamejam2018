@@ -88,8 +88,8 @@ class Game:
         self.house_states = []
         self.generate_house_locations()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
-        self.arrow = pygame.image.load_extended('Assets/GameJam/arrow.png')
-        self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets/GameJam/arrow2.png'), (100, 100))
+        self.arrow = pygame.image.load_extended('Assets\\Images\\arrow.png')
+        self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\arrow2.png'), (100, 100))
         self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'), (int(417/2.5), int(188/2.5)))
         self.danger = False
         self.transmission_time = 300
@@ -214,7 +214,6 @@ class Game:
                     self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90), self.rotatePoint((self.dimensionX/2, self.dimensionY/2), (int(self.dimensionX/2)-50, 100), -rot + 90))
 
                 #TODO: if any house on screen is broadcasting, don't show an arrow
-
 
             for event in pygame.event.get():
                 if event.type == QUIT:
