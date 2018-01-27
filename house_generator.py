@@ -24,7 +24,7 @@ def distance(a, b):
     return sqrt((a.x-b.x)**2+(a.y-b.y)**2)
 
 island_radius = 1100
-n_houses = 20
+n_houses = 10
 min_house_dist = 600
 
 def play_music(music_file):

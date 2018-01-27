@@ -5,6 +5,7 @@ from house import House
 import state_house
 from house_generator import *
 import time
+import math
 from entity import Entity
 
 class Player:
@@ -88,11 +89,21 @@ class Game:
         self.generate_house_locations()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         self.arrow = pygame.image.load_extended('Assets/GameJam/arrow.png')
+        self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets/GameJam/arrow2.png'), (100, 100))
+        self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'), (int(417/2.5), int(188/2.5)))
         self.danger = False
-        self.transmission_time = 3
+        self.transmission_time = 300
         self.transmission_event =pygame.USEREVENT+5
         self.initial = True
         pygame.time.set_timer(self.transmission_event, self.transmission_time*1000)
+    def rotatePoint(self,centerPoint,point,angle):
+        """Rotates a point around another centerPoint. Angle is in degrees.
+        Rotation is counter-clockwise"""
+        angle = math.radians(angle)
+        temp_point = point[0]-centerPoint[0] , point[1]-centerPoint[1]
+        temp_point = ( temp_point[0]*math.cos(angle)-temp_point[1]*math.sin(angle) , temp_point[0]*math.sin(angle)+temp_point[1]*math.cos(angle))
+        temp_point = temp_point[0]+centerPoint[0] , temp_point[1]+centerPoint[1]
+        return temp_point
 
     def generate_house_locations(self):
         valid_points = generate_house_locations()
@@ -116,7 +127,17 @@ class Game:
         print("Entered house", which)
         self.nextstate = self.house_states[which]
     def fire_transmission(self):
+        self.initial = False
         print('fired')
+        #pick a house that isn't currently broadcasting - NB this can be a house expecting to receive a broadcast
+        curr_house_pick = -1
+        while True:
+            curr_house_pick = random.choice(self.house_list)
+            if curr_house_pick.broadcast_status[0]:
+                continue
+            break
+        curr_house_pick.broadcast_status = (True, curr_house_pick.broadcast_status[1])
+        #set it to be currently broadcasting
 
     def main_loop(self):
         self.done = False
@@ -172,7 +193,26 @@ class Game:
             #self.screen.fill(0, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
-            
+
+            #if we have transmissions, add an arrow
+            broadcasting = [i for i in self.house_list if i.broadcast_status[0]]
+            if len(broadcasting):
+                for house in broadcasting:
+                    if distance(Point(house.worldX, house.worldY), Point(self.player.worldX, self.player.worldY)) + 300 < math.sqrt((self.dimensionX/2)**2 + (self.dimensionY/2)**2):
+                        self.screen.blit(self.broadcast, (house.worldX - self.player.worldX + (self.dimensionX + house.visual.width)/2 - 90, \
+                            house.worldY - self.player.worldY + 40 + (self.dimensionY - house.visual.height)/2 + 25))
+                #find nearest house
+                nearest = min(broadcasting, key = lambda h: distance(Point(h.worldX, h.worldY), Point(self.player.worldX, self.player.worldY)))
+                #find rotation
+                rot = -math.degrees(math.atan2(nearest.worldY - self.player.worldY, nearest.worldX - self.player.worldX))
+                if rot < 0:
+                    rot += 360
+                if distance(Point(nearest.worldX, nearest.worldY), Point(self.player.worldX, self.player.worldY)) + 300 > math.sqrt((self.dimensionX/2)**2 + (self.dimensionY/2)**2):
+                    self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90), self.rotatePoint((self.dimensionX/2, self.dimensionY/2), (int(self.dimensionX/2)-50, 100), -rot + 90))
+
+                #TODO: if any house on screen is broadcasting, don't show an arrow
+
+
             for event in pygame.event.get():
                 if event.type == QUIT:
                     quit()
