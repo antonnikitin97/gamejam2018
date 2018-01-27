@@ -83,10 +83,10 @@ class Game:
 
     def generate_house_locations(self):
         valid_points = generate_house_locations()
-        for house in valid_points:
+        for i, house in enumerate(valid_points):
             tuple = (house.x, house.y)
             self.house_list.append(House(*tuple))
-            self.house_states.append(state_house.HouseScreen(self.screen, self))
+            self.house_states.append(state_house.HouseScreen(self.screen, self, i))
     
     def endgame(self, victory):
         self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)

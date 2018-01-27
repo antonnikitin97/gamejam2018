@@ -13,10 +13,10 @@ noises = 0
 symbols = 0
 transmission_offset = 100
 class HouseScreen:
-    def __init__(self, screen, overworld):
+    def __init__(self, screen, overworld, which):
         self.screen = screen
         self.done = False
-        self.house = 1
+        self.house = which
         self.waiting_sounds = []
         self.current_channel = pygame.mixer.Channel(0)
         global noises
@@ -28,14 +28,16 @@ class HouseScreen:
             buffer = 1024    # number of samples
             pygame.mixer.init(freq, bitsize, channels, buffer)
             noises = self.load_bird_noises()
-            print(noises)
+            print(len(noises))
             symbols = self.load_symbols()
+            print(len(symbols))
         self.noises = noises
         self.symbols = symbols
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
         self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
+        self.transmission_received = False
         self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
@@ -51,9 +53,11 @@ class HouseScreen:
         return [pygame.transform.scale(img, (int(img.get_width() * scale_const),
                                              int(img.get_height() * scale_const))) for img in imgs]
     
-    #TODO: each location should make a unique triplet or so from its id
+    #TODO: each location should make a unique triplet or so from its settlement and number
     def get_location_encoding(self, id):
-        return [10, 8]
+        loc_code = [int((id - (id % 5)) / 5), id % 5]
+        print(id, loc_code)
+        return loc_code
 
     def music_seq(self, length):
         #start on a random note
@@ -63,12 +67,12 @@ class HouseScreen:
         
         curr_offset = start - 6
         notes = [start]
-        for i in range(length-1):
+        for i in range(length - 1):
             while True:
                 step = random.choice([3, 5, 7])*random.choice([-1, 1])
                 if len(notes) > 1 and (notes[-1] == notes[-2]) and step == 0:
                     continue
-                print(step)
+                #print(step)
                 if abs(curr_offset + step) > 9:
                     continue
                 else:
@@ -81,12 +85,11 @@ class HouseScreen:
 
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):
-        to = 0
         while True:
             destination = random.randint(0, num_houses)
             if destination != from_id:
                 break
-        return self.get_location_encoding(to) + self.music_seq(length)
+        return self.get_location_encoding(destination) + self.music_seq(length)
 
     def start_receiving_transmission(self):
         #make a new transmission
@@ -94,22 +97,22 @@ class HouseScreen:
         print(transmission)
         #copy it over
         for note in transmission:
-            print('hi')
+            #print('hi')
             self.waiting_sounds.append(note)
         #start off displaying the parts of the transmission
         print(self.noises)
+        self.transmission_received = True
         self.display_next_sequence()
 
     def display_next_sequence(self):
         if len(self.waiting_sounds) == 0:
             return
-        element = self.waiting_sounds[0]
-        del self.waiting_sounds[0]
-        #somehow draw a pciture of the element here
-        e = self.symbols[element]
+        element = self.waiting_sounds.pop(0)
+        # somehow draw a picture of the element here
+        # e = self.symbols[element]
         
         self.current_channel.play(self.noises[element])
-        self.transmission.append(e)
+        self.transmission.append(element)
         
     def leavehouse(self):
         self.nextstate = self.overworld
@@ -131,22 +134,28 @@ class HouseScreen:
                 self.screen.blit(self.player2.get_sprite(), (self.player2.worldX, self.player2.worldY))
             offs = 0
             for i in range(len(self.transmission)):
-                self.screen.blit(self.transmission[i], (transmission_offset + offs, transmission_offset))
-                offs += self.transmission[i].get_width() + 5
+                thissymbol = self.symbols[self.transmission[i]]
+                self.screen.blit(thissymbol, (transmission_offset + offs, transmission_offset))
+                offs += thissymbol.get_width() + 5
             if self.doormat_collider.colliderect(self.player2.collision):
                 self.leavehouse()
             for event in pygame.event.get():
                 if event.type == QUIT:
                     exit()
                 if event.type == KEYDOWN:
-                    if event.key == K_q:
+                    if event.key == K_g:
                         if not len(self.waiting_sounds):
-                            chan = self.start_receiving_transmission()
+                            if not self.transmission_received:
+                                chan = self.start_receiving_transmission()
+                            else:
+                                self.waiting_sounds = self.transmission.copy()
+                                self.transmission = []
+                                self.display_next_sequence()
                     if event.key == K_w:
                         self.leavehouse()
 
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
-                print('aaaaa')
+                #print('aaaaa')
                 self.display_next_sequence()
             pygame.display.flip()
         return self.nextstate
