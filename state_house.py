@@ -81,7 +81,7 @@ class HouseScreen:
                     break
         #notes = [random.randint(-6, 7) for _ in range(length)]
         #return [note_names[n % 12]+str(3 if n < 0 else (5 if n == 12 else 4)) for n in notes]
-        return [n+7 for n in notes]
+        return [n + 7 for n in notes]
 
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):

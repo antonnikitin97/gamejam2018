@@ -86,6 +86,7 @@ class Game:
         self.house_states = []
         self.generate_house_locations()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
+        self.arrow = pygame.image.load_extended('Assets/GameJam/arrow.png')
         self.danger = False
 
     def generate_house_locations(self):
@@ -140,8 +141,13 @@ class Game:
 
             housecollide = self.player.visual.collidelist([house.visual for house in self.house_list])
             if housecollide != -1:
-                text_surface = self.textfont.render('Press G to enter the house! :)', False, WHITE, BLACK)
+                text_surface = self.textfont.render('Press G to enter house {}'.format(housecollide),
+                                                    False, WHITE, BLACK)
                 self.screen.blit(text_surface, (20, 20))
+                currhouse = self.house_list[housecollide]
+                arrowx = currhouse.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width()) / 2
+                arrowy = currhouse.worldY - 100 - self.player.worldY - self.arrow.get_height() + self.dimensionY / 2
+                self.screen.blit(self.arrow, (arrowx, arrowy))
                 if pygame.key.get_pressed()[K_g]:
                     self.enterhouse(housecollide)
             playersprite = self.player.get_sprite()
