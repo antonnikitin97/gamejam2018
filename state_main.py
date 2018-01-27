@@ -15,7 +15,7 @@ class Player:
         self.screenY = self.worldY
         self.speed = 10
         self.orient = 0
-        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Bird Frame {}.png'.format(i)), (204, 152)) for i in range(1, 6)]
+        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)), (204, 152)) for i in range(1, 6)]
         down_img = [pygame.transform.rotate(img[i], 90)for i in range(len(img))]
         right_img = [pygame.transform.flip(img[i], True, False) for i in range(len(img))]
         up_img = [pygame.transform.flip(down_img[i], False, True) for i in range(len(img))]
@@ -79,15 +79,15 @@ class Game:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\GameJam\World map.png'), (3000, 2550))
-        self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Exterior.png'),
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\Images\World map.png'), (3000, 2550))
+        self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
                                             (int(898/5), int(876/5)))
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
         self.house_states = []
         self.generate_house_locations()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
-        self.arrow = pygame.image.load_extended('Assets/GameJam/arrow.png')
+        self.arrow = pygame.image.load_extended('Assets/Images/arrow.png')
         self.danger = False
 
     def generate_house_locations(self):

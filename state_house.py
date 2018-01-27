@@ -38,7 +38,7 @@ class HouseScreen:
         self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
         self.transmission_received = False
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'), (960, 720))
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
