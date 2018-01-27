@@ -122,7 +122,7 @@ class HouseScreen:
         self.done = False
         while not self.done:
             pressed_keys = pygame.key.get_pressed()
-            self.player2.move(pressed_keys)
+            self.player2.move(pressed_keys, self.bounding_collider)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
             pygame.draw.rect(self.screen, 255, self.bounding_collider)

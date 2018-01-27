@@ -24,33 +24,43 @@ class Player:
         self.seimg = pygame.transform.rotate(self.up_img, 225)
         self.visual = pygame.Rect((self.screenX, self.screenY, 204, 152))
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
+        self.projected_collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
     
     def get_sprite(self):
         li = [self.img, self.down_img, self.right_img, self.up_img, self.nwimg, self.swimg, self.neimg, self.seimg]
         return li[self.orient]
     
-    def move(self, pressed_keys):
+    def move(self, pressed_keys, projected_box=None):
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
+        xdiff = 0
+        ydiff = 0
         if pressed_keys[K_DOWN]:
-                self.worldY += self.speed
-                self.orient = 1
+            ydiff = self.speed
+            self.orient = 1
         if pressed_keys[K_UP]:
-            self.worldY -= self.speed
+            ydiff = -self.speed
             self.orient = 3
         if pressed_keys[K_LEFT]:
-            self.worldX -= self.speed
+            xdiff = -self.speed
             self.orient = 0
             if pressed_keys[K_UP]:
                 self.orient = 4
             if pressed_keys[K_DOWN]:
                 self.orient = 5
         if pressed_keys[K_RIGHT]:
-            self.worldX += self.speed
+            xdiff = self.speed
             self.orient = 2
             if pressed_keys[K_UP]:
                 self.orient = 6
             if pressed_keys[K_DOWN]:
                 self.orient = 7
+        self.projected_collision = pygame.Rect((self.worldX + xdiff, self.worldY + ydiff, 204, 152))
+        if projected_box == None:
+            self.worldX += xdiff
+            self.worldY += ydiff
+        elif projected_box.contains(self.projected_collision):
+            self.worldX += xdiff
+            self.worldY += ydiff
 
 
 class Game:
