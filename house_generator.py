@@ -1,12 +1,11 @@
 from math import sqrt
 from random import randint
 import random
-from pyknon.genmidi import Midi
-from pyknon.music import NoteSeq
 import pygame
 import time, numpy, pygame.mixer, pygame.sndarray
 from scipy.signal import resample
 import numpy as np
+import wave
 
 class Point:
     def __init__(self,x_init,y_init):
@@ -71,7 +70,7 @@ def generate_house_locations():
 	return list_houses
 
 def get_location_encoding(place):
-		return 0 #TODO
+		return [0, 3, 6]
 
 #protocol:
 #header consisting of 0, 0
@@ -86,9 +85,8 @@ def music_seq(length):
 	#A-G = 0-7
 	note_names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 	start = random.randint(0, 12)
-	start_offset = 0
 	
-	curr_offset = start_offset
+	curr_offset = start
 	notes = [start]
 	for i in range(length):
 		while True:
@@ -96,56 +94,88 @@ def music_seq(length):
 			if len(notes) > 1 and (notes[-1] == notes[-2]) and step == 0:
 				continue
 			print(step)
-			if abs(curr_offset + step) > 12:
+			if abs(curr_offset + step) > 8:
 				continue
 			else:
 				curr_offset = curr_offset + step
 				notes.append(curr_offset + start)
 				break
 	#notes = [random.randint(-6, 7) for _ in range(length)]
-	return [note_names[n % 12]+str(3 if n < 0 else (5 if n == 12 else 4)) for n in notes]
+	#return [note_names[n % 12]+str(3 if n < 0 else (5 if n == 12 else 4)) for n in notes]
+	return [n+7 for n in notes]
+def load_bird_noises():
+	return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(16)]
 
 if __name__ == "__main__":
 	#generate_house_locations()
 	#generate_IP_message(10)
 	print(music_seq(6))
-	notes1 = NoteSeq(" ".join(music_seq(6)))
-	midi = Midi(1, tempo=90)
-	midi.seq_notes(notes1, track=0)
-	midi.write("demo.mid")
+
+	#notes1 = NoteSeq(" ".join(music_seq(6)))
+	#midi = Midi(1, tempo=90)
+	#midi.seq_notes(notes1, track=0)
+	#midi.write("demo.mid")
+
+	# optional volume 0 to 1.0
+	#music_file = "demo.mid"
+	#pygame.mixer.music.set_volume(0.8)
+	
+	#try:
+	#    play_music(music_file)
+	#except KeyboardInterrupt:
+	    # if user hits Ctrl/C then exit
+	    # (works only in console mode)
+	#    pygame.mixer.music.fadeout(1000)
+	#    pygame.mixer.music.stop()
+	#    raise SystemExit
+	# choose a file and make a sound object
 	freq = 44100    # audio CD quality
 	bitsize = -16   # unsigned 16 bit
 	channels = 2    # 1 is mono, 2 is stereo
 	buffer = 1024    # number of samples
 	pygame.mixer.init(freq, bitsize, channels, buffer)
-	# optional volume 0 to 1.0
-	music_file = "demo.mid"
-	pygame.mixer.music.set_volume(0.8)
+	noises = load_bird_noises()
+	seq = music_seq(8)
+	for n in seq:
+		print(n)
+		noises[n].play()
+		time.sleep(2)
 	'''
-	try:
-	    play_music(music_file)
-	except KeyboardInterrupt:
-	    # if user hits Ctrl/C then exit
-	    # (works only in console mode)
-	    pygame.mixer.music.fadeout(1000)
-	    pygame.mixer.music.stop()
-	    raise SystemExit
-	'''
-	# choose a file and make a sound object
-	sound_file = "bir2.wav"
+	sound_file =  "bir2.wav"
 	sound = pygame.mixer.Sound(sound_file)
+	sound.play()
+	time.sleep(1)
 
 	# load the sound into an array
 	snd_array = pygame.sndarray.array(sound)
-
+	
 	# resample. args: (target array, ratio, mode), outputs ratio * target array.
 	# this outputs a bunch of garbage and I don't know why.
 	sounds = []
-	for i in range(12):
-			snd_resample = resample(snd_array, int(42404*(2**(i/12)))).astype(np.int16, order='C')
+	for i in range(23):
+			snd_resample = resample(snd_array, int(42404*(2**((-i)/12)))).astype(np.int16, order='C')
+			print('i')
 			sounds = sounds + [pygame.sndarray.make_sound(snd_resample)]
 
 	# take the resampled array, make it an object and stop playing after 2 seconds.
-	for snd in sounds:
-			snd.play()
-			time.sleep(2)
+	for i in range(len(sounds)):
+		snd = sounds[i]
+		snd.play()
+		time.sleep(1)
+		sfile = wave.open('Assets\\Audio\\bird' + str(i) +'.wav', 'w')
+		# sampling frequency (in Herz: the number of samples per second)
+		SAMPLINGFREQ = 80000
+		# the number of channels (1=mono, 2=stereo)
+		NCHANNELS = 1
+
+		# set the parameters
+		sfile.setframerate(SAMPLINGFREQ)
+		sfile.setnchannels(NCHANNELS)
+		sfile.setsampwidth(2)
+
+		# write raw PyGame sound buffer to wave file
+		sfile.writeframesraw(snd.get_raw())
+
+		# close file
+		sfile.close()
+	'''
