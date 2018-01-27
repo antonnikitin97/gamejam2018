@@ -50,5 +50,7 @@ class Menu:
                         self.selectedbutton = (self.selectedbutton + 1) % len(self.buttons)
                     if event.key == K_RETURN:
                         self.buttons[self.selectedbutton].pressfunction()
+                    if event.key == K_ESCAPE:
+                        quit()
             pygame.display.flip()
         return self.nextstate

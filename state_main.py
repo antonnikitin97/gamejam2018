@@ -1,8 +1,9 @@
 import sys, pygame
 from pygame.locals import *
-from state_gameover import EndScreen
-from house import House
+import state_gameover
 import state_house
+import state_options
+from house import House
 from house_generator import *
 import time
 import math
@@ -122,13 +123,18 @@ class Game:
             self.house_states.append(state_house.HouseScreen(self.screen, self, i))
     
     def endgame(self, victory):
-        self.nextstate = EndScreen(self.screen, victory, -1234567890)
+        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
         self.done = True
     
     def enterhouse(self, which):
         self.done = True
         print("Entered house", which)
         self.nextstate = self.house_states[which]
+    
+    def enteroptions(self):
+        self.done = True
+        self.nextstate = state_options.Menu(self.screen, self)
+    
     def fire_transmission(self):
         self.initial = False
         print('fired')
@@ -225,6 +231,8 @@ class Game:
                     if event.key == K_2:
                         # temporary victory function
                         self.endgame(True)
+                    if event.key == K_ESCAPE:
+                        self.enteroptions()
                 if event.type == self.transmission_event:
                     print('THIS WORKED')
                     self.fire_transmission()
