@@ -47,3 +47,13 @@ The initial transmissions are short messages, however messages become later as t
 Potential extensions:
 More mechanics added into the protocol - for instance headers that require specific decoded responses at the receiving end
 
+
+---
+
+IMPLEMENTATION
+
+Random location of houses:
+N houses placed uniformly randomly within a circle of the island, houses cannot be touching
+at least Y houses within each quadrant of the circle
+
+
