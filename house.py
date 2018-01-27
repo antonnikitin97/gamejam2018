@@ -8,3 +8,4 @@ class House(Entity):
                                    sprite.get_width(),
                                    sprite.get_height()))
         self.size = max(sprite.get_width(), sprite.get_height())
+        self.broadcast_status = (False, False)

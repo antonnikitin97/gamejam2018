@@ -39,10 +39,13 @@ class HouseScreen:
         self.transmission = []
         self.transmission_received = False
         self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
+        self.bubble = pygame.image.load_extended('Assets\\GameJam\\speech.png')
+        self.router_birb = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'), (int(594/5), int(841/5)))
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
+        self.is_bubble_displayed = 0
 
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
@@ -102,6 +105,7 @@ class HouseScreen:
         #start off displaying the parts of the transmission
         print(self.noises)
         self.transmission_received = True
+        self.is_bubble_displayed = -1
         self.display_next_sequence()
 
     def display_next_sequence(self):
@@ -129,10 +133,13 @@ class HouseScreen:
             self.player2.move(pressed_keys, self.bounding_collider)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
+            self.screen.blit(self.router_birb, (transmission_offset + 480, transmission_offset + 180))
             # pygame.draw.rect(self.screen, 255, self.bounding_collider)
             # pygame.draw.rect(self.screen, 255, self.doormat_collider)
             if self.bounding_collider.contains(self.player2.collision):
                 self.screen.blit(self.player2.get_sprite(), (self.player2.worldX, self.player2.worldY))
+            if self.is_bubble_displayed != 0:
+                self.screen.blit(self.bubble, (transmission_offset - 30, transmission_offset - 50))
             offs = 0
             for i in range(len(self.transmission)):
                 thissymbol = self.symbols[self.transmission[i]]

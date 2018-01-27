@@ -89,6 +89,10 @@ class Game:
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         self.arrow = pygame.image.load_extended('Assets/GameJam/arrow.png')
         self.danger = False
+        self.transmission_time = 3
+        self.transmission_event =pygame.USEREVENT+5
+        self.initial = True
+        pygame.time.set_timer(self.transmission_event, self.transmission_time*1000)
 
     def generate_house_locations(self):
         valid_points = generate_house_locations()
@@ -111,9 +115,15 @@ class Game:
         self.done = True
         print("Entered house", which)
         self.nextstate = self.house_states[which]
+    def fire_transmission(self):
+        print('fired')
 
     def main_loop(self):
         self.done = False
+        #on the first run, immediately run a transmission
+        if self.initial:
+            self.fire_transmission()
+        self.initial = False
         WHITE = (255, 255, 255)
         BLACK = (0, 0, 0)
         while not self.done:
@@ -173,9 +183,14 @@ class Game:
                     if event.key == K_2:
                         # temporary victory function
                         self.endgame(True)
+                if event.type == self.transmission_event:
+                    print('THIS WORKED')
+                    self.fire_transmission()
+
             pygame.display.flip()
+            pygame.time.wait(3)
         return self.nextstate
 
-
+#means you can run the whole thing from this file
 import StateMachine
 StateMachine.run()
