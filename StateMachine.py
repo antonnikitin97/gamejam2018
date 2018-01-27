@@ -1,12 +1,16 @@
 import pygame
-import state_menu
-pygame.init()
+import state_menu, state_main
 
-screen = pygame.display.set_mode((640, 480))
 
-menustate = state_menu.Menu(screen)
+def run():
+	pygame.init()
 
-state = menustate
+	screen = pygame.display.set_mode((960, 720))
 
-while True:
-    state = state.main_loop()
+	menustate = state_main.Game(screen)
+
+	state = menustate
+	while True:
+		state = state.main_loop()
+
+run()

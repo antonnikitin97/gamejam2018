@@ -6,8 +6,8 @@ from house_generator import *
 
 class Player:
     def __init__(self, x, y):
-        self.worldX = 0
-        self.worldY = 0
+        self.worldX = x / 2
+        self.worldY = y / 2
         self.screenX = x / 2
         self.screenY = y / 2
         self.visual = pygame.Rect((self.screenX, self.screenY, 10, 10))
@@ -38,30 +38,33 @@ class Game:
     def main_loop(self):
         self.generate_house_locations()
         while not self.done:
-            self.screen.blit(self.map, (self.player.worldX, self.player.worldY))
+            self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY  + self.dimensionY/2))
             pygame.draw.rect(self.screen, 255, self.player.visual)
+            #wtf is this collision thing 
+            #it's not right
             collision_visual = pygame.Rect((self.player.worldX,
                                             self.player.worldY, 10, 10))
             pygame.draw.rect(self.screen, 255, collision_visual)
 
             for house in self.house_list:
-                object_screen_x = -house.worldX + self.player.worldX + (self.dimensionX / 2)
-                object_screen_y = -house.worldY + self.player.worldY + (self.dimensionY / 2)
+                object_screen_x = house.worldX - self.player.worldX + (self.dimensionX / 2)
+                object_screen_y = house.worldY - self.player.worldY + (self.dimensionY / 2)
 
                 house.visual.x = object_screen_x
                 house.visual.y = object_screen_y
-                pygame.draw.rect(self.screen, 255, house.visual)
+                #pygame.draw.rect(self.screen, 255, house.visual)
 
             pressed_keys = pygame.key.get_pressed()
 
             if pressed_keys[K_DOWN]:
-                self.player.worldY -= 2
-            if pressed_keys[K_UP]:
                 self.player.worldY += 2
+            if pressed_keys[K_UP]:
+                self.player.worldY -= 2
             if pressed_keys[K_LEFT]:
-                self.player.worldX += 2
-            if pressed_keys[K_RIGHT]:
                 self.player.worldX -= 2
+            if pressed_keys[K_RIGHT]:
+                self.player.worldX += 2
+                print(self.player.worldX, self.player.worldY)
 
             for event in pygame.event.get():
                 if event.type == QUIT:

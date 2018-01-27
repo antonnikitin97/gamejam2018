@@ -7,6 +7,8 @@ TRANSMISSION_EVENT = 10000
 num_houses = 15
 sound_endevent = pygame.event.Event(TRANSMISSION_EVENT)
 noises = 0
+symbols = 0
+transmission_offset = 100
 class HouseScreen:
     def __init__(self, screen, overworld):
         self.screen = screen
@@ -15,6 +17,7 @@ class HouseScreen:
         self.waiting_sounds = []
         self.current_channel = pygame.mixer.Channel(0)
         global noises
+        global symbols
         if noises == 0:
             freq = 44100    # audio CD quality
             bitsize = -16   # unsigned 16 bit
@@ -23,18 +26,26 @@ class HouseScreen:
             pygame.mixer.init(freq, bitsize, channels, buffer)
             noises = self.load_bird_noises()
             print(noises)
+            symbols = self.load_symbols()
         self.noises = noises
+        self.symbols = symbols
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
-        self.textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
+        self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Interior2.png'), (960, 720))
         
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
 
+    def load_symbols(self):
+        scale_const = 0.4
+        imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png') for i in range(1, 20)]
+        return [pygame.transform.scale(img, (int(img.get_width()*scale_const), int(img.get_height()*scale_const))) for img in imgs]
+
     #TODO: each location should make a unique triplet or so from its id
     def get_location_encoding(self, id):
-        return [10, 8, 10]
+        return [10, 8]
 
     def music_seq(self, length):
         #start on a random note
@@ -58,7 +69,7 @@ class HouseScreen:
                     break
         #notes = [random.randint(-6, 7) for _ in range(length)]
         #return [note_names[n % 12]+str(3 if n < 0 else (5 if n == 12 else 4)) for n in notes]
-        return [n+9 for n in notes]
+        return [n+7 for n in notes]
 
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):
@@ -88,7 +99,7 @@ class HouseScreen:
         element = self.waiting_sounds[0]
         del self.waiting_sounds[0]
         #somehow draw a pciture of the element here
-        e = self.textfont.render(str(element), False, (0, 0, 0))
+        e = self.symbols[element]
         
         self.current_channel.play(self.noises[element])
         self.transmission.append(e)
@@ -97,8 +108,11 @@ class HouseScreen:
         chan = None
         while not self.done:
             self.screen.fill((255, 255, 255))
+            self.screen.blit(self.map, (0, 0))
+            offs = 0
             for i in range(len(self.transmission)):
-                self.screen.blit(self.transmission[i], (20, 20 + i*(self.textfont.get_height())))
+                self.screen.blit(self.transmission[i], (transmission_offset + offs, transmission_offset))
+                offs += self.transmission[i].get_width() + 5
             for event in pygame.event.get():
                 if event.type == QUIT:
                     exit()
