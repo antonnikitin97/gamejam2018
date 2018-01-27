@@ -4,31 +4,35 @@ import state_gameover
 from house import House
 import state_house
 from house_generator import *
+import time
 from entity import Entity
 
 class Player:
     def __init__(self, x, y):
-        self.img = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\flyspritefill.png'), (204, 152))
         self.worldX = x / 2
         self.worldY = y / 2
         self.screenX = self.worldX
         self.screenY = self.worldY
         self.speed = 10
         self.orient = 0
-        self.down_img = pygame.transform.rotate(self.img, 90)
-        self.right_img = pygame.transform.flip(self.img, True, False)
-        self.up_img = pygame.transform.flip(self.down_img, False, True)
-        self.swimg = pygame.transform.rotate(self.img, 45)
-        self.nwimg = pygame.transform.rotate(self.img, 315)
-        self.neimg = pygame.transform.rotate(self.up_img, 315)
-        self.seimg = pygame.transform.rotate(self.up_img, 225)
+        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Bird Frame {}.png'.format(i)), (204, 152)) for i in range(1, 6)]
+        down_img = [pygame.transform.rotate(img[i], 90)for i in range(len(img))]
+        right_img = [pygame.transform.flip(img[i], True, False) for i in range(len(img))]
+        up_img = [pygame.transform.flip(down_img[i], False, True) for i in range(len(img))]
+        swimg = [pygame.transform.rotate(img[i], 45) for i in range(len(img))]
+        nwimg = [pygame.transform.rotate(img[i], 315) for i in range(len(img))]
+        neimg = [pygame.transform.rotate(up_img[i], 315) for i in range(len(img))]
+        seimg = [pygame.transform.rotate(up_img[i], 225) for i in range(len(img))]
+        self.spritearray = [img, down_img, right_img, up_img,
+                            nwimg, swimg, neimg, seimg]
+        self.frame = 0
+        self.lastspritechangetime = 0
         self.visual = pygame.Rect((self.screenX, self.screenY, 204, 152))
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
         self.projected_collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
     
     def get_sprite(self):
-        li = [self.img, self.down_img, self.right_img, self.up_img, self.nwimg, self.swimg, self.neimg, self.seimg]
-        return li[self.orient]
+        return self.spritearray[self.orient][self.frame]
     
     def move(self, pressed_keys, projected_box=None):
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
@@ -61,6 +65,9 @@ class Player:
         elif projected_box.contains(self.projected_collision):
             self.worldX += xdiff
             self.worldY += ydiff
+        if time.time() - self.lastspritechangetime > 0.02:
+            self.frame = (self.frame + 1) % len(self.spritearray[0])
+            self.lastspritechangetime = time.time()
 
 
 class Game:
@@ -137,7 +144,9 @@ class Game:
                 self.screen.blit(text_surface, (20, 20))
                 if pygame.key.get_pressed()[K_g]:
                     self.enterhouse(housecollide)
-            self.screen.blit(self.player.get_sprite(), self.player.visual)
+            playersprite = self.player.get_sprite()
+            self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
+                                            (self.dimensionY - playersprite.get_height())/2))
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
