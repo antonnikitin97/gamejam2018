@@ -23,6 +23,7 @@ class Player:
         self.neimg = pygame.transform.rotate(self.up_img, 315)
         self.seimg = pygame.transform.rotate(self.up_img, 225)
         self.visual = pygame.Rect((self.screenX, self.screenY, 204, 152))
+        self.collision = pygame.Rect((self.screenX, self.screenY, 204, 152))
     def get_sprite(self):
         li = [self.img, self.down_img, self.right_img, self.up_img, self.nwimg, self.swimg, self.neimg, self.seimg]
         return li[self.orient]
@@ -83,6 +84,7 @@ class Game:
         while not self.done:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY + self.dimensionY/2))
+            # self.player.collision.x
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             #wtf is this collision thing 
             #it's not right

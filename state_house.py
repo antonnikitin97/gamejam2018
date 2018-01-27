@@ -13,6 +13,7 @@ symbols = 0
 transmission_offset = 100
 class HouseScreen:
     def __init__(self, screen, overworld):
+        # self.collider = pygame.Rect((self.map.x, self.map.y, self.map.get_width(), self.map.get_height()))
         self.screen = screen
         self.done = False
         self.house = 1
@@ -127,10 +128,10 @@ class HouseScreen:
                 if event.type == QUIT:
                     exit()
                 if event.type == KEYDOWN:
-                    if event.key == K_DOWN:
+                    if event.key == K_q:
                         if not len(self.waiting_sounds):
                                 chan = self.start_receiving_transmission()
-                    if event.key == K_UP:
+                    if event.key == K_w:
                         self.nextstate = self.overworld
                         self.done = True
 
