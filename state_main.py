@@ -79,8 +79,9 @@ class Game:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\GameJam\map.jpg'), (3000, 2550))
-        self.house = pygame.image.load_extended('Assets\\GameJam\\house.png')
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\GameJam\World map.png'), (3000, 2550))
+        self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\Exterior.png'),
+                                            (int(898/5), int(876/5)))
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
         self.house_states = []
@@ -93,7 +94,13 @@ class Game:
         valid_points = generate_house_locations()
         for i, house in enumerate(valid_points):
             tuple = (house.x, house.y)
-            self.house_list.append(House(*tuple))
+            self.house_list.append(House(*tuple, self.house))
+        print(self.house_list)
+        self.house_list = sorted(self.house_list, key=lambda house: house.worldY)
+        print(self.house_list)
+
+        for i, house in enumerate(self.house_list):
+            self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self, i))
     
     def endgame(self, victory):
@@ -120,40 +127,33 @@ class Game:
             #                                self.player.worldY, 10, 10))
             #pygame.draw.rect(self.screen, 255, collision_visual)
 
+            # if self.player.worldX - self.dimensionX / 2 >= 0 and self.player.worldX - self.dimensionX / 2 <= 640 and \
+            #         self.player.worldY - self.dimensionY / 2 >= 0 and self.player.worldY - self.dimensionY / 2 <= 480:
+            color_pixel = self.screen.get_at((int(self.player.visual.centerx), int(self.player.visual.centery)))
+
+            if color_pixel.r == 38 and color_pixel.g == 142 and color_pixel.b == 143:
+                self.danger = True
+                text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK)
+                self.screen.blit(text_surface, (20,20))
+
             for house in self.house_list:
-                object_screen_x = house.worldX - self.player.worldX + (self.dimensionX / 2) - house.visual.width/2
-                object_screen_y = house.worldY - self.player.worldY + (self.dimensionY / 2) - house.visual.height/2
-
-                house.visual.x = object_screen_x
-                house.visual.y = object_screen_y
-
-                #pygame.draw.rect(self.screen, 255, house.visual)
-                self.screen.blit(self.house, house.visual)
-
-                # if self.player.worldX - self.dimensionX / 2 >= 0 and self.player.worldX - self.dimensionX / 2 <= 640 and \
-                #         self.player.worldY - self.dimensionY / 2 >= 0 and self.player.worldY - self.dimensionY / 2 <= 480:
-                color_pixel = self.screen.get_at((int(self.player.visual.centerx), int(self.player.visual.centery)))
-
-                if color_pixel.r == 38 and color_pixel.g == 142 and color_pixel.b == 143:
-                    self.danger = True
-                    text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK)
-                    self.screen.blit(text_surface, (20,20))
-
+                house.visual.x = house.worldX - self.player.worldX + (self.dimensionX + house.visual.width) / 2
+                house.visual.y = house.worldY - self.player.worldY + (self.dimensionY + house.visual.height) / 2
+                
             housecollide = self.player.visual.collidelist([house.visual for house in self.house_list])
             if housecollide != -1:
                 text_surface = self.textfont.render('Press G to enter house {}'.format(housecollide),
                                                     False, WHITE, BLACK)
                 self.screen.blit(text_surface, (20, 20))
-                currhouse = self.house_list[housecollide]
-                arrowx = currhouse.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width()) / 2
-                arrowy = currhouse.worldY - 100 - self.player.worldY - self.arrow.get_height() + self.dimensionY / 2
+                house = self.house_list[housecollide]
+                arrowx = house.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width() + house.visual.width)/2
+                arrowy = house.worldY - self.player.worldY + 40 + (self.dimensionY - self.arrow.get_height() - house.visual.height)/2
                 self.screen.blit(self.arrow, (arrowx, arrowy))
                 if pygame.key.get_pressed()[K_g]:
                     self.enterhouse(housecollide)
             playersprite = self.player.get_sprite()
             self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
                                             (self.dimensionY - playersprite.get_height())/2))
-            #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
             
