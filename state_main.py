@@ -66,20 +66,26 @@ class Game:
         self.house = pygame.image.load_extended('Assets\\GameJam\\house.png')
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
+        self.house_states = []
         self.generate_house_locations()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         self.danger = False
-
-    
-    def endgame(self, victory):
-        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
-        self.done = True
 
     def generate_house_locations(self):
         valid_points = generate_house_locations()
         for house in valid_points:
             tuple = (house.x, house.y)
             self.house_list.append(House(*tuple))
+            self.house_states.append(state_house.HouseScreen(self.screen, self))
+    
+    def endgame(self, victory):
+        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
+        self.done = True
+    
+    def enterhouse(self, which):
+        self.done = True
+        print("Entered house", which)
+        self.nextstate = self.house_states[which]
 
     def main_loop(self):
         self.done = False
@@ -87,7 +93,8 @@ class Game:
         BLACK = (0, 0, 0)
         while not self.done:
             self.screen.fill((38, 142, 143))
-            self.screen.blit(self.map, (- self.player.worldX + self.dimensionX/2, - self.player.worldY + self.dimensionY/2))
+            self.screen.blit(self.map, ((self.dimensionX / 2) - self.player.worldX,
+                                        (self.dimensionY / 2) - self.player.worldY))
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             #wtf is this collision thing 
             #it's not right
@@ -108,23 +115,23 @@ class Game:
                 # if self.player.worldX - self.dimensionX / 2 >= 0 and self.player.worldX - self.dimensionX / 2 <= 640 and \
                 #         self.player.worldY - self.dimensionY / 2 >= 0 and self.player.worldY - self.dimensionY / 2 <= 480:
                 color_pixel = self.screen.get_at((int(self.player.visual.centerx), int(self.player.visual.centery)))
-                print("Color blue: " + str(color_pixel.b))
 
                 if color_pixel.r == 38 and color_pixel.g == 142 and color_pixel.b == 143:
                     self.danger = True
                     text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK)
                     self.screen.blit(text_surface, (20,20))
-            
-            for house in self.house_list:
-                if house.visual.colliderect(self.player.visual):
-                    text_surface = self.textfont.render('Press G to enter the house! :)', False, WHITE, BLACK)
-                    self.screen.blit(text_surface, (20, 20))
+
+            housecollide = self.player.visual.collidelist([house.visual for house in self.house_list])
+            if housecollide != -1:
+                text_surface = self.textfont.render('Press G to enter the house! :)', False, WHITE, BLACK)
+                self.screen.blit(text_surface, (20, 20))
+                if pygame.key.get_pressed()[K_g]:
+                    self.enterhouse(housecollide)
             self.screen.blit(self.player.get_sprite(), self.player.visual)
             #pygame.draw.rect(self.screen, 255, self.player.visual)
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
-
-
+            
             for event in pygame.event.get():
                 if event.type == QUIT:
                     quit()
@@ -135,12 +142,6 @@ class Game:
                     if event.key == K_2:
                         # temporary victory function
                         self.endgame(True)
-                    if event.key == K_g:
-                        for house in self.house_list:
-                            if house.visual.colliderect(self.player.visual):
-                                self.done = True
-                                self.nextstate = state_house.HouseScreen(self.screen, self)
-
             pygame.display.flip()
         return self.nextstate
 

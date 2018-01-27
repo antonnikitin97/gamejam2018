@@ -119,6 +119,7 @@ class HouseScreen:
         chan = None
         self.player2.worldX = 400
         self.player2.worldY = 400
+        self.done = False
         while not self.done:
             pressed_keys = pygame.key.get_pressed()
             self.player2.move(pressed_keys)
