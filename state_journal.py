@@ -2,11 +2,22 @@ import pygame
 from pygame.locals import *
 
 class Book:
-    def __init__(self, screen, options, statein):
+    def __init__(self, screen, options, statein, map, houses):
         self.done = False
         self.screen = screen
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
+        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
+        self.bigfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 200)
+        self.map = map.copy()
+        self.houses = houses
+        for i, house in enumerate(self.houses):
+            pygame.draw.circle(self.map, (0, 0, 0),
+                               (int(house.worldX + house.visual.width/2), int(house.worldY + house.visual.height/2)),
+                               300)
+            number = self.bigfont.render(str(i), True, (255, 255, 255)).convert_alpha()
+            self.map.blit(number, (house.worldX + (house.visual.width - number.get_width())/2,
+                                   house.worldY + (house.visual.height - number.get_height())/2))
         self.options = options
         self.prevstate = statein
         self.page = pygame.Surface((self.dimensionX/2, self.dimensionY)).convert_alpha()
@@ -16,17 +27,24 @@ class Book:
         self.symbols = [pygame.transform.scale(pygame.image.load_extended('Assets/symbols/{}.png'.format(i)),
                                                (100, 100)).convert_alpha()
                         for i in range(1, 21)]
-        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         titles = ["PostCodes 1", "PostCodes 2", "Island Map West", "Island Map East", "Current Jobs"]
         self.pages = [self.page.copy() for i in range(len(titles))]
-        for i in range(len(self.pages)):
-            self.pages[i].blit(self.textfont.render(titles[i], True, (0, 0, 0)), (10, 10))
-            self.pages[i].blit(self.textfont.render("Pg. " + str(i + 1), True, (0, 0, 0)), (10, self.dimensionY - 45))
         for i in range(5):
             self.pages[0].blit(self.symbols[0], (10, 100 + i * 110))
             self.pages[0].blit(self.symbols[int(i % 5)], (110, 100 + i * 110))
+            self.pages[0].blit(self.textfont.render("House " + str(i), True, (0, 0, 0)), (210, 100 + i * 110))
             self.pages[1].blit(self.symbols[1], (10, 100 + i * 110))
             self.pages[1].blit(self.symbols[int((i + 5) % 5)], (110, 100 + i * 110))
+            self.pages[1].blit(self.textfont.render("House " + str(i + 5), True, (0, 0, 0)), (210, 100 + i * 110))
+        westmap = pygame.transform.scale(self.map.subsurface((0, 0, self.map.get_width()/2, self.map.get_height())),
+                                                  (int(self.map.get_width()/20), int(self.map.get_height()/10))).convert_alpha()
+        eastmap = pygame.transform.scale(self.map.subsurface((self.map.get_width() / 2, 0, self.map.get_width() / 2, self.map.get_height())),
+                                                  (int(self.map.get_width() / 20), int(self.map.get_height()/10))).convert_alpha()
+        self.pages[2].blit(westmap, (self.dimensionX/2 - westmap.get_width() - 5, 50))
+        self.pages[3].blit(eastmap, (5, 50))
+        for i in range(len(self.pages)):
+            self.pages[i].blit(self.textfont.render(titles[i], True, (0, 0, 0), (255, 255, 255)), (10, 10))
+            self.pages[i].blit(self.textfont.render("Pg. " + str(i + 1), True, (0, 0, 0), (255, 255, 255)), (10, self.dimensionY - 45))
         self.pageselector = 0
     
     def leavejournal(self):
@@ -45,9 +63,9 @@ class Book:
                 if e.type == KEYDOWN:
                     if e.key in [K_ESCAPE, K_s]:
                         self.leavejournal()
-                    if e.key == K_a:
+                    if e.key in [K_LEFT, K_a]:
                         self.pageselector -= 1
-                    if e.key == K_d:
+                    if e.key in [K_RIGHT, K_d]:
                         self.pageselector += 1
                     self.pageselector = min(max(self.pageselector, 0), len(self.pages) - 2)
         return self.nextstate
