@@ -10,11 +10,11 @@ import math
 from entity import Entity
 
 class Player:
-    def __init__(self, x, y):
-        self.worldX = x / 2
-        self.worldY = y / 2
-        self.screenX = self.worldX
-        self.screenY = self.worldY
+    def __init__(self, dimensionX, dimensionY):
+        self.worldX = 1818
+        self.worldY = 1667
+        self.screenX = dimensionX / 2
+        self.screenY = dimensionY / 2
         self.speed = 10
         self.orient = 0
         img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)).convert_alpha(), (204, 152)) for i in range(1, 6)]
@@ -74,16 +74,17 @@ class Player:
 
 class Game:
     def __init__(self, screen, options):
-        pygame.font.init()
         self.screen = screen
         self.options = options
+        self.options["TOTAL"] = 0
+        self.options["DELIVERED"] = 0
+        self.options["TIME"] = 0
         self.done = False
         self.nextstate = None
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\Images\World map.png'),
-                                          (3000, 2550)).convert_alpha()
+        self.map = pygame.image.load_extended('Assets\Images\WorldMap.png').convert_alpha()
         self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
                                             (int(898/5), int(876/5))).convert_alpha()
         self.player = Player(self.dimensionX, self.dimensionY)
@@ -127,19 +128,6 @@ class Game:
             self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i))
     
-    def endgame(self, victory):
-        self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory, -1234567890)
-        self.done = True
-    
-    def enterhouse(self, which):
-        self.done = True
-        print("Entered house", which)
-        self.nextstate = self.house_states[which]
-    
-    def enteroptions(self):
-        self.done = True
-        self.nextstate = state_options.Menu(self.screen, self.options, self)
-    
     def fire_transmission(self):
         self.initial = False
         print('fired')
@@ -152,31 +140,45 @@ class Game:
             break
         curr_house_pick.broadcast_status = (True, curr_house_pick.broadcast_status[1])
         #set it to be currently broadcasting
+    
+    def endgame(self, victory):
+        self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory, time.time() - self.start)
+        self.done = True
+    
+    def enterhouse(self, which):
+        self.done = True
+        print("Entered house", which)
+        self.nextstate = self.house_states[which]
+        self.pause()
+    
+    def enteroptions(self):
+        self.done = True
+        self.nextstate = state_options.Menu(self.screen, self.options, self)
+        self.pause()
+        
+    def pause(self):
+        self.options["TIME"] += time.time() - self.start
+        print("Timer paused at", self.options["TIME"])
+    
+    def unpause(self):
+        self.start = time.time()
+        print("Timer unpaused at", self.options["TIME"])
 
     def main_loop(self):
         self.done = False
-        #on the first run, immediately run a transmission
+        #on the first run, immediately run a transmission and start the timer
         if self.initial:
             self.fire_transmission()
-        self.initial = False
+            self.initial = False
         WHITE = (255, 255, 255)
         BLACK = (0, 0, 0)
+        self.unpause()
         while not self.done:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, ((self.dimensionX / 2) - self.player.worldX,
                                         (self.dimensionY / 2) - self.player.worldY))
-            #pygame.draw.rect(self.screen, 255, self.player.visual)
-            #wtf is this collision thing 
-            #it's not right
-            #collision_visual = pygame.Rect((self.player.worldX,
-            #                                self.player.worldY, 10, 10))
-            #pygame.draw.rect(self.screen, 255, collision_visual)
-
-            # if self.player.worldX - self.dimensionX / 2 >= 0 and self.player.worldX - self.dimensionX / 2 <= 640 and \
-            #         self.player.worldY - self.dimensionY / 2 >= 0 and self.player.worldY - self.dimensionY / 2 <= 480:
-            color_pixel = self.screen.get_at((int(self.player.visual.centerx), int(self.player.visual.centery)))
-
-            if color_pixel.r == 38 and color_pixel.g == 142 and color_pixel.b == 143:
+            
+            if not self.map.get_rect().colliderect(self.player.collision):
                 self.danger = True
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20,20))
@@ -185,7 +187,7 @@ class Game:
             for i, house in enumerate(self.house_list):
                 house.visual.x = house.worldX - self.player.worldX + (self.dimensionX) / 2
                 house.visual.y = house.worldY - self.player.worldY + (self.dimensionY) / 2
-                #self.screen.fill(0, house.visual)
+                #self.screen.fill(0, house.visual)  # for debugging hitboxes
                 if self.player.visual.colliderect(house.visual):
                     d = sqrt((self.player.worldX - house.worldX) ** 2 +
                              (self.player.worldY - house.worldY) ** 2)
@@ -204,7 +206,7 @@ class Game:
             playersprite = self.player.get_sprite()
             self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
                                             (self.dimensionY - playersprite.get_height())/2))
-            #self.screen.fill(0, self.player.visual)
+            #self.screen.fill(0, self.player.visual)  # for debugging hitboxes
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
 

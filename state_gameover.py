@@ -5,7 +5,7 @@ from button import Button
 
 
 class EndScreen:
-    def __init__(self, screen, options, victory, points):
+    def __init__(self, screen, options, victory, timetaken):
         self.done = False
         self.nextstate = None
         self.screen = screen
@@ -13,7 +13,8 @@ class EndScreen:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.victory = victory
-        self.points = points
+        self.points = options["SCORE"]
+        self.time = timetaken
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
         textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
@@ -21,12 +22,12 @@ class EndScreen:
             self.stamp = pygame.image.load_extended('Assets/Images/Bird Frame 1.png')  # Standin image
             self.scorestatement = [textfont.render("GOOD JOB, FINE AVIAN", True, BLACK, WHITE),
                                    textfont.render("", True, BLACK, WHITE),
-                                   textfont.render(str(points), True, BLACK, WHITE)]
+                                   textfont.render(str(self.time), True, BLACK, WHITE)]
         else:
             self.stamp = pygame.image.load_extended('Assets/Images/Bird standing.png') # Standin image
             self.scorestatement = [textfont.render("404 ERROR:", True, BLACK, WHITE),
                                    textfont.render("BIRD NOT FOUND", True, BLACK, WHITE),
-                                   textfont.render(str(points), True, BLACK, WHITE)]
+                                   textfont.render(str(self.time), True, BLACK, WHITE)]
         self.stamp = pygame.transform.scale(self.stamp, (200, 300))  # Temporary shoehorning
         # Standin for buttons as they come
         playbutton = textfont.render("PLAY AGAIN", True, BLACK, WHITE)

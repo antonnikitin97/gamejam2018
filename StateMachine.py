@@ -17,10 +17,10 @@ def fadeout():
 		screen.blit(alphaSurface,(0,0)) # Blit it to the screen-surface (Make them separate)
 		# Trivial pygame stuff.
 		if pygame.key.get_pressed()[K_ESCAPE]:
-				DONE = True
+			DONE = True
 		for ev in pygame.event.get():
-				if ev.type == QUIT:
-					DONE = True
+			if ev.type == QUIT:
+				DONE = True
 		#print(alph)
 		if alph > 10:
 			break
@@ -31,7 +31,10 @@ def run():
     global screen
     screen = pygame.display.set_mode((960, 720))
     initialoptions = {"FULLSCREEN": False,
-                      "SOUND": True}
+                      "SOUND": True,
+                      "TOTAL": 0,     # number of packets given
+                      "DELIVERED": 0, # number delivered correctly
+                      "TIME": 0}      # time taken to do so
     menustate = state_menu.Menu(screen, initialoptions)
     state = menustate
     while True:
