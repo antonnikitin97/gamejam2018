@@ -53,7 +53,7 @@ class HouseScreen:
         self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
         img = [pygame.transform.scale(
             pygame.image.load_extended('Assets\\Images\\ToolTip Frame {}.png'.format(i)).convert_alpha(),
-            (408, 304)) for i in range(1, 5)]
+            (592, 348)) for i in range(1, 5)]
         self.spritearray = [img]
         self.sprite_help_index = 0
         self.sprite_help_limit = 5
@@ -321,9 +321,9 @@ class HouseScreen:
                     self.current_sprite = 0
 
             if not self.is_in_receive:
-                self.screen.blit(self.spritearray[0][self.current_sprite], (-40, self.placememt_rect_y))
+                self.screen.blit(self.spritearray[0][self.current_sprite], (-60, self.placememt_rect_y))
                 if self.show_tips:
-                    if self.placememt_rect_y <= 460:
+                    if self.placememt_rect_y <= 435:
                         self.placememt_rect_y += 0
                     else:
                         self.placememt_rect_y -= 5
