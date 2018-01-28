@@ -150,10 +150,12 @@ class Game:
         self.house_list = sorted(self.house_list, key=lambda house: house.worldY)
         #print(self.house_list)
         self.house_states = []
-        
+        self.house_assets = (pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'), (960, 720)).convert_alpha(), \
+            pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha(), pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'), \
+            (int(594/5), int(841/5))).convert_alpha(), pygame.image.load_extended('Assets\\Images\\symbutt.png'), pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30))
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
-            self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i]))
+            self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i], self.house_assets))
         
         for pos in generate_house_locations(self.tree, self.islandmap.get_width() * 0.7 + self.oceanborderx,
                                                        self.islandmap.get_height() * 0.3 + self.oceanbordery,

@@ -14,7 +14,7 @@ noises = 0
 symbols = 0
 transmission_offset = 100
 class HouseScreen:
-    def __init__(self, screen, options, overworld, which, which_obj):
+    def __init__(self, screen, options, overworld, which, which_obj, house_assets):
         self.screen = screen
         self.options = options
         self.done = False
@@ -38,24 +38,19 @@ class HouseScreen:
         self.symbols = symbols
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
-        self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
         self.transmission_received = False
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'),
-                                          (960, 720)).convert_alpha()
-        self.bubble = pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha()
-        self.router_birb = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'),
-                                                  (int(594/5), int(841/5))).convert_alpha()
+        self.map, self.bubble, self.router_birb, self.button_back, self.textfont = house_assets
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
         self.is_bubble_displayed = 0
         button_offset = 400
-        self.button_back = pygame.image.load_extended('Assets\\Images\\symbutt.png')
         self.buttons = []
         self.currently_entered_sequence = []
         self.is_in_receive = False
+        self.has_finished_inputting = False
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
 
@@ -129,12 +124,13 @@ class HouseScreen:
     def optionselected(self, id):
         self.currently_entered_sequence.append(id)
         print(self.currently_entered_sequence)
+        #should also add it to a big speech bubble thing
 
         if len(self.current_delivery) != 0:
             next_entry = self.current_delivery.pop(0)
             self.display_delivery_options(next_entry)
         else:
-            self.is_in_receive = False
+            self.has_finished_inputting = True
 
 
         #todo: put 
@@ -142,7 +138,7 @@ class HouseScreen:
         butts = []
         for i in range(len(options)):
             b1 = button.ButtonWithStuffOn(self.screen, int(i*self.overworld.dimensionX/3) + self.button_back.get_width()/2, 480, self.button_back, self.symbols[options[i]], \
-                self.noises[options[i]], self.optionselected, i)
+                self.noises[options[i]], self.optionselected, options[i])
             butts.append(b1)
         self.buttons = butts
         print('added butts')
@@ -242,7 +238,13 @@ class HouseScreen:
                 self.display_next_sequence()
             if self.is_in_receive:
                 for i, b in enumerate(self.buttons):
-                    b.show(0)
+                    if not self.has_finished_inputting:
+                        b.show(0)
+                self.screen.blit(pygame.transform.flip(self.bubble, True, False), (transmission_offset - 30, transmission_offset - 90))
+                for i in range(len(self.currently_entered_sequence)):
+                    thissymbol = self.symbols[self.currently_entered_sequence[i]]
+                    self.screen.blit(thissymbol, (transmission_offset + offs + 200, transmission_offset - 30))
+                    offs += thissymbol.get_width() + 5
 
             pygame.display.flip()
         return self.nextstate
