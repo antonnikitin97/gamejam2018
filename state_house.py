@@ -2,6 +2,7 @@ from random import randint
 import random
 import time
 import pygame
+import pygame.time
 import state_options
 import copy
 import button
@@ -21,6 +22,11 @@ class HouseScreen:
         self.house_obj = which_obj
         self.waiting_sounds = []
         self.current_channel = pygame.mixer.Channel(0)
+        self.show_tips = False
+        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
+        self.placememt_rect_x = 0
+        self.placememt_rect_y = 700
+        self.default_placement = 700
         global noises
         global symbols
         if noises == 0:
@@ -42,6 +48,15 @@ class HouseScreen:
         self.map, self.bubble, self.router_birb, self.button_back, self.textfont, self.tick, self.cross = house_assets
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
+        self.birb_collider = pygame.Rect((transmission_offset + 480, transmission_offset + 180, int(594/5), int(841/5)))
+        self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
+        img = [pygame.transform.scale(
+            pygame.image.load_extended('Assets\\Images\\ToolTip Frame {}.png'.format(i)).convert_alpha(),
+            (408, 304)) for i in range(1, 5)]
+        self.spritearray = [img]
+        self.sprite_help_index = 0
+        self.sprite_help_limit = 5
+        self.current_sprite = 0
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
         self.player2.speed /= 2
@@ -51,6 +66,7 @@ class HouseScreen:
         self.currently_entered_sequence = []
         self.is_in_receive = False
         self.has_finished_inputting = False
+        self.clock = pygame.time.Clock()
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
 
@@ -232,8 +248,13 @@ class HouseScreen:
         self.player2.worldX = 400
         self.player2.worldY = 400
         self.player2.orient = 0
+        self.placememt_rect_x = 0
         self.done = False
         while not self.done:
+            self.current_time = self.clock.tick(70) / 1000
+            self.show_tips = False
+            if self.birb_collider.colliderect(self.player2.collision):
+                self.show_tips = True
             pressed_keys = pygame.key.get_pressed()
             if not self.is_in_receive:
                 self.player2.move(pressed_keys, self.bounding_collider)
@@ -283,5 +304,36 @@ class HouseScreen:
                     offs += 155
             if self.has_finished_inputting:
                 self.mark_corrections()
+            # pygame.draw.rect(self.screen, 255, self.birb_collider)
+            # pygame.draw.rect(self.screen, 255, self.player2.collision)
+            # pygame.draw.rect(self.screen, 255, self.placememt_rect)
+            # for x in range(4):
+            #     self.screen.blit(self.spritearray[0][x], (400, 400))
+
+            self.screen.blit(self.spritearray[0][self.current_sprite], (-40, self.placememt_rect_y))
+
+            self.sprite_help_index += 0.1
+            if self.sprite_help_index >= self.sprite_help_limit:
+                self.sprite_help_index = 0
+                # self.screen.blit(self.spritearray[0][self.current_sprite - 1], (400, 400))
+                # self.screen.blit(self.spritearray[0][self.current_sprite], (400, 400))
+                self.current_sprite += 1
+                if self.current_sprite > 3:
+                    self.current_sprite = 0
+
+            if self.show_tips:
+                if self.placememt_rect_y <= 460:
+                    self.placememt_rect_y += 0
+                else:
+                    self.placememt_rect_y -= 10
+                    print(self.placememt_rect_y)
+                    # if self.placememt_rect_y >= 600:
+                    #     self.placememt_rect_y += 0
+                    # self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
+                    # print("TIPS!")
+            else:
+                if self.placememt_rect_y != self.default_placement:
+                    self.placememt_rect_y += 10
+                    # self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
             pygame.display.flip()
         return self.nextstate
