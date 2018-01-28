@@ -7,6 +7,7 @@ import state_options
 import copy
 import button
 from pygame.locals import *
+import os
 
 TRANSMISSION_EVENT = 10000
 sound_endevent = pygame.event.Event(TRANSMISSION_EVENT)
@@ -24,7 +25,7 @@ class HouseScreen:
         self.current_channel = pygame.mixer.Channel(0)
         self.show_tips = False
         self.give_transmission = False
-        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
+        self.textfont = pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30)
         self.placememt_rect_x = 0
         self.placememt_rect_y = 700
         self.default_placement = 700
@@ -52,7 +53,7 @@ class HouseScreen:
         self.birb_collider = pygame.Rect((transmission_offset + 480, transmission_offset + 180, int(594/5), int(841/5)))
         self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
         img = [pygame.transform.scale(
-            pygame.image.load_extended('Assets\\Images\\ToolTip Frame {}.png'.format(i)).convert_alpha(),
+            pygame.image.load_extended(os.path.join('Assets','Images','ToolTip Frame {}.png'.format(i))).convert_alpha(),
             (592, 348)) for i in range(1, 5)]
         self.spritearray = [img]
         self.sprite_help_index = 0
@@ -69,14 +70,14 @@ class HouseScreen:
         self.has_finished_inputting = False
         self.clock = pygame.time.Clock()
     def load_bird_noises(self):
-        return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
+        return [pygame.mixer.Sound(os.path.join('Assets','Audio',"bird" + str(i) + ".wav")) for i in range(21)]
 
     def load_symbols(self):
         scale_const = 0.4
-        imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png').convert_alpha() for i in range(1, 21)]
+        imgs = [pygame.image.load_extended(os.path.join('Assets','symbols',str(i) + '.png')).convert_alpha() for i in range(1, 21)]
         return [pygame.transform.scale(img, (int(img.get_width() * scale_const),
                                              int(img.get_height() * scale_const))) for img in imgs]
-    
+
     #TODO: each location should make a unique triplet or so from its settlement and number
     def get_location_encoding(self, id):
         loc_code = [int((id - (id % 5)) / 5), id % 5]
@@ -88,7 +89,7 @@ class HouseScreen:
         #A-G = 0-7
         note_names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
         start = random.randint(0, 12)
-        
+
         curr_offset = start - 6
         notes = [start]
         for i in range(length - 1):
@@ -120,7 +121,7 @@ class HouseScreen:
             random.shuffle(li)
             return li
         return [get_options(e) for e in expected_transmission]
-    def start_delivering_transmission(self):       
+    def start_delivering_transmission(self):
         #to deliver a transmission, the player is presented with 3 options
         #each option has a symbol and a noise
         #click the symbol to add it to the transmission
@@ -150,7 +151,7 @@ class HouseScreen:
         else:
             self.has_finished_inputting = True
 
-        #todo: put 
+        #todo: put
     def display_delivery_options(self, options):
         butts = []
         self.give_transmission = True
@@ -230,14 +231,14 @@ class HouseScreen:
         element = self.waiting_sounds.pop(0)
         # somehow draw a picture of the element here
         # e = self.symbols[element]
-        
+
         self.current_channel.play(self.noises[element])
         self.transmission.append(element)
-        
+
     def enteroptions(self):
         self.done = True
         self.nextstate = state_options.Menu(self.screen, self.options, self)
-    
+
     def leavehouse(self):
         self.nextstate = self.overworld
         self.is_in_receive = False

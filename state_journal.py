@@ -1,4 +1,5 @@
 import pygame
+import os
 from pygame.locals import *
 
 class Book:
@@ -8,8 +9,8 @@ class Book:
         self.player = player
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
-        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
-        self.bigfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 200)
+        self.textfont = pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30)
+        self.bigfont = pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 200)
         self.map = map.copy()
         self.houses = houses
         for i, house in enumerate(self.houses):
@@ -25,7 +26,7 @@ class Book:
         self.page.fill((255, 255, 255))
         pygame.draw.line(self.page, (0, 0, 0), (0, 0), (0, self.dimensionY), 4)
         pygame.draw.line(self.page, (0, 0, 0), (self.dimensionX/2 - 2, 0), (self.dimensionX/2 - 2, self.dimensionY), 4)
-        self.symbols = [pygame.image.load_extended('Assets/symbols/{}.png'.format(i)) for i in range(1, 21)]
+        self.symbols = [pygame.image.load_extended(os.path.join('Assets','symbols/{}.png'.format(i))) for i in range(1, 21)]
         self.bigsymbols = [pygame.transform.scale(symbol, (100, 100)).convert_alpha() for symbol in self.symbols]
         self.smallsymbols = [pygame.transform.scale(symbol, (50, 50)).convert_alpha() for symbol in self.symbols]
         titles = ["PostCodes 1", "PostCodes 2", "Island Map West", "Island Map East", "Current Jobs"]
@@ -57,18 +58,18 @@ class Book:
         self.pageselector = 0
         self.pagebckgrd = pygame.Surface((self.dimensionX, self.dimensionY))
         self.pagebckgrd.fill((255, 255, 255))
-        leftpage = pygame.transform.scale(pygame.image.load_extended('Assets/Images/Page 1.png'),
+        leftpage = pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Page 1.png')),
                                           (int(self.dimensionX/2), self.dimensionY))
-        rightpage = pygame.transform.scale(pygame.image.load_extended('Assets/Images/Page 2.png'),
+        rightpage = pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Page 2.png')),
                                            (int(self.dimensionX / 2), self.dimensionY))
         self.pagebckgrd.blit(leftpage, (self.dimensionX/2 - leftpage.get_width(), 0))
         self.pagebckgrd.blit(rightpage, (self.dimensionX / 2, 0))
         self.pagebckgrd = self.pagebckgrd.convert_alpha()
-    
+
     def leavejournal(self):
         self.done = True
         self.nextstate = self.prevstate
-    
+
     def main_loop(self):
         self.done = False
         while not self.done:
