@@ -132,7 +132,7 @@ class Game:
         self.oceantile = pygame.image.load_extended('Assets\Images\WavesSolo.png').convert_alpha()
         self.oceanborderx = 1035
         self.oceanbordery = 987
-        self.dudes = [Dude(random.randint(500, self.islandmap.get_width()-500), random.randint(500, self.islandmap.get_width()-500)) for _ in range(10)]
+        self.dudes = [Dude(random.randint(1035, self.islandmap.get_width()-1035), random.randint(987, self.islandmap.get_width()-987)) for _ in range(20)]
         self.islandrect = pygame.Rect(self.oceanborderx, self.oceanbordery,
                                       self.islandmap.get_width(), self.islandmap.get_height())
         self.map = pygame.Surface((self.islandmap.get_width() + self.oceanborderx * 2,
