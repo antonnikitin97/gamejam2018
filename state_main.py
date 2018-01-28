@@ -114,12 +114,15 @@ class Game:
                                             (int(898/5), int(876/5))).convert_alpha()
         self.tree = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Tree Translucent.png'),
                                            (int(2421/5), int(1977/5))).convert_alpha()
+        self.grasses = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Grass {}.png'.format(i)),
+                                               (100, 100)).convert_alpha()
+                        for i in range(1, 4)]
         self.player = Player(self.dimensionX, self.dimensionY)
         self.player.worldX += self.oceanborderx
         self.player.worldY += self.oceanbordery
         self.house_list = []
         self.house_states = []
-        self.generate_house_locations()
+        self.generate_terrain()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         self.arrow = pygame.image.load_extended('Assets\\Images\\arrow.png').convert_alpha()
         self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\arrow2.png'),
@@ -143,7 +146,15 @@ class Game:
         temp_point = temp_point[0]+centerPoint[0] , temp_point[1]+centerPoint[1]
         return temp_point
 
-    def generate_house_locations(self):
+    def generate_terrain(self):
+        # Grass
+        for i in range(3):
+            for pos in generate_house_locations(self.grasses[i],
+                                                self.map.get_width() / 2, self.map.get_height() / 2,
+                                                min(self.islandmap.get_width(), self.islandmap.get_height()) / 2,
+                                                30):
+                self.map.blit(self.grasses[i], (pos.x, pos.y))
+        # Houses
         valid_points = generate_house_locations(self.house,
                                                 self.map.get_width() / 2, self.map.get_height() / 2,
                                                 min(self.islandmap.get_width(), self.islandmap.get_height()) / 2,
@@ -161,7 +172,7 @@ class Game:
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i], self.house_assets))
-        
+        # Trees
         for pos in generate_house_locations(self.tree, self.islandmap.get_width() * 0.7 + self.oceanborderx,
                                                        self.islandmap.get_height() * 0.3 + self.oceanbordery,
                                             self.islandmap.get_height() * 0.3, 3):
