@@ -169,7 +169,7 @@ class HouseScreen:
         for i, b in enumerate(self.currently_entered_sequence):
             #for each symbol, if it matches then put a tick above it
             #else put a cross
-            print(self.currently_entered_sequence, self.overworld.player.get_transmission(self.house))
+            #print(self.currently_entered_sequence, self.overworld.player.get_transmission(self.house))
             mark = self.tick if b == self.overworld.player.get_transmission(self.house)[i] else self.cross
             self.screen.blit(mark, (transmission_offset + offs + 10, transmission_offset + 50))
             offs += 155

@@ -1,8 +1,7 @@
 import pygame
 from pygame.locals import *
-import state_main, state_house, state_options
+import state_main, state_house, state_options, state_instr
 from button import Button
-import threading
 
 class Menu:
     def __init__(self, screen, options):
@@ -19,9 +18,11 @@ class Menu:
         textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
         # Standin for buttons as they come
         playbutton = textfont.render("PLAY", True, BLACK, WHITE)
+        instrbutton = textfont.render("INSTRUCTIONS", True, BLACK, WHITE)
         optionsbutton = textfont.render("OPTIONS", True, BLACK, WHITE)
         quitbutton = textfont.render("QUIT", True, BLACK, WHITE)
-        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY/2 - 50, playbutton, self.startgame),
+        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY/2 - 100, playbutton, self.startgame),
+                        Button(screen, self.dimensionX / 2, self.dimensionY/2 - 50, instrbutton, self.instructions),
                         Button(screen, self.dimensionX / 2, self.dimensionY/2, optionsbutton, self.enteroptions),
                         Button(screen, self.dimensionX / 2, self.dimensionY/2 + 50, quitbutton, quit)]
         self.selectedbutton = 0
@@ -30,19 +31,19 @@ class Menu:
     def startgame(self):
         self.screen.blit(pygame.font.Font('Assets\OpenSans-Regular.ttf', 30).render('Loading...', True, (0,0,0), (255, 255, 255)), (400, 600))
         pygame.display.flip()
-        while self.game is None:
-            pygame.time.wait(30)
+        self.load_game()
         self.nextstate = self.game
         self.done = True
     
     def enteroptions(self):
         self.nextstate = state_options.Menu(self.screen, self.options, self, False)
         self.done = True
+    def instructions(self):
+        self.nextstate = state_instr.Instr(self.screen, self)
+        self.done = True
     
     def main_loop(self):
         self.done = False
-        load_thread = threading.Thread(target=self.load_game)
-        load_thread.start()
         while not self.done:
             self.screen.fill((255, 255, 255))
             for i, b in enumerate(self.buttons):

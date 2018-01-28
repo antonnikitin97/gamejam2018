@@ -318,7 +318,7 @@ class Game:
                     if event.key == K_w:
                         self.enterjournal()
                 if event.type == self.transmission_event:
-                    print('THIS WORKED')
+                    #print('THIS WORKED')
                     self.fire_transmission()
 
             pygame.display.flip()
