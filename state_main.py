@@ -65,10 +65,10 @@ class Player:
         if (dest, transmission) in self.current_transmissions:
             return
         else:
-            print(transmission)
+            #print(transmission)
             self.current_transmissions.append((dest, transmission[2:]))
     def get_transmission(self, dest):
-        print(self.current_transmissions)
+        #print(self.current_transmissions)
         for d in self.current_transmissions:
             if d[0] == dest:
                 return d[1]
@@ -209,7 +209,7 @@ class Game:
     
     def fire_transmission(self):
         self.initial = False
-        print('fired')
+        #print('fired')
         #pick a house that isn't currently broadcasting - NB this can be a house expecting to receive a broadcast
         curr_house_pick = -1
         while True:
@@ -222,12 +222,12 @@ class Game:
     
     def endgame(self, victory):
         self.pause()
-        self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory, time.time() - self.start)
+        self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory)
         self.done = True
     
     def enterhouse(self, which):
         self.done = True
-        print("Entered house", which)
+        #print("Entered house", which)
         self.pause()
         self.nextstate = self.house_states[which]
     
@@ -243,12 +243,12 @@ class Game:
         
     def pause(self):
         self.options["TIME"] += time.time() - self.start
-        print("Timer paused at", self.options["TIME"])
+        #print("Timer paused at", self.options["TIME"])
         self.paused = True
     
     def unpause(self):
         self.start = time.time()
-        print("Timer unpaused at", self.options["TIME"])
+        #print("Timer unpaused at", self.options["TIME"])
         self.paused = False
 
     def main_loop(self):
@@ -270,7 +270,8 @@ class Game:
                 self.danger_time += 10
 
                 if self.danger_time >= self.danger_limit:
-                    self.nextstate = state_gameover.EndScreen(self.screen, self.options, False, 1010101010)
+                    self.nextstate = state_gameover.EndScreen(self.screen, self.options, False,
+                                                              "404 Error: Birb not found")
                     self.done = True
                     print("BLEH!")
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
@@ -298,8 +299,6 @@ class Game:
                     self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90).convert_alpha(),
                                      self.rotatePoint((self.dimensionX / 2, self.dimensionY / 2),
                                                       (int(self.dimensionX / 2) - 50, 100), - rot + 90))
-
-                # TODO: if any house on screen is broadcasting, don't show an arrow
 
             housecollide = [-1, self.dimensionX]
             for i, house in enumerate(self.house_list):
@@ -337,30 +336,25 @@ class Game:
                                             (self.dimensionY - playersprite.get_height())/2))
             
             
-            scoretext = self.textfont.render("Score: {}/{}".format(self.options["DELIVERED"], self.options["TOTAL"]),
-                                             True, BLACK, WHITE).convert_alpha()
             scoretext = self.textfont.render("Score: " + str(self.options["TOTAL"]), True, BLACK, WHITE).convert_alpha()
             scoretext2 = self.textfont.render("Delivered: {}/{}".format(self.options["DELIVERED"], self.options["OUT_OF"]), True, BLACK, WHITE).convert_alpha()
             scoretext3 = self.textfont.render("Accuracy: {0:.0f}%".format(self.options["CORRECT_SYM"]*100/(self.options["TOTAL_SYM"] \
              if self.options["TOTAL_SYM"] != 0 else 1)), True, BLACK, WHITE).convert_alpha()
             timetext = self.textfont.render("Time: {:0.2f}".format(self.options["TIME"] + (time.time() - self.start) * (not self.paused)),
                                             True, BLACK, WHITE).convert_alpha()
-            print(self.options)
+            #print(self.options)
             self.screen.blit(scoretext, (self.dimensionX - scoretext.get_width() - 5, 5))
             self.screen.blit(scoretext2, (self.dimensionX - scoretext2.get_width() - 5, 40))
             self.screen.blit(scoretext3, (self.dimensionX - scoretext2.get_width() - 5, 75))
             self.screen.blit(timetext, (self.dimensionX - timetext.get_width() - 5, 115))
             
+            if self.options["OUT_OF"] == 5:
+                self.endgame(True)
+            
             for event in pygame.event.get():
                 if event.type == QUIT:
                     quit()
                 if event.type == KEYDOWN:
-                    if event.key == K_1:
-                        # temporary death function
-                        self.endgame(False)
-                    if event.key == K_2:
-                        # temporary victory function
-                        self.endgame(True)
                     if event.key == K_ESCAPE:
                         self.enteroptions()
                     if event.key == K_j:

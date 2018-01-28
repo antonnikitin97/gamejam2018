@@ -5,7 +5,7 @@ from button import Button
 
 
 class EndScreen:
-    def __init__(self, screen, options, victory, timetaken):
+    def __init__(self, screen, options, victory, endtext="GOOD JOB, FINE AVIAN"):
         self.done = False
         self.nextstate = None
         self.screen = screen
@@ -14,25 +14,23 @@ class EndScreen:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.victory = victory
-        self.time = timetaken
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
         textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
-        self.stamp = pygame.image.load_extended('Assets/Images/Bird Frame 1.png')  # Standin image
-        self.scorestatement = [textfont.render("GOOD JOB, FINE AVIAN", True, BLACK, WHITE),
+        self.stamp = pygame.image.load_extended('Assets/Images/Bird standing.png')  # Standin image
+        self.scorestatement = [textfont.render(endtext, True, BLACK, WHITE),
                                textfont.render("{}/{} Symbols delivered correctly".format(self.options["CORRECT_SYM"],
                                                                                           self.options["TOTAL_SYM"]),
                                                True, BLACK, WHITE),
                                textfont.render("In a time of {:0.2f}".format(self.options["TIME"]), True, BLACK, WHITE),
                                textfont.render("FINAL SCORE: " + str(self.options["TOTAL"]), True, BLACK, WHITE)]
-        self.stamp = pygame.transform.scale(self.stamp, (200, 300))  # Temporary shoehorning
         # Standin for buttons as they come
         playbutton = textfont.render("PLAY AGAIN", True, BLACK, WHITE)
         menubutton = textfont.render("QUIT TO MENU", True, BLACK, WHITE)
         quitbutton = textfont.render("QUIT GAME", True, BLACK, WHITE)
-        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY/2 - 150, playbutton, self.startgame),
-                        Button(screen, self.dimensionX / 2, self.dimensionY/2 - 100, menubutton, self.tomenu),
-                        Button(screen, self.dimensionX / 2, self.dimensionY/2 - 50, quitbutton, quit)]
+        self.buttons = [Button(screen, int(self.dimensionX * 0.6), int(self.dimensionY*0.75 - 150), playbutton, self.startgame),
+                        Button(screen, int(self.dimensionX * 0.6), int(self.dimensionY*0.75 - 100), menubutton, self.tomenu),
+                        Button(screen, int(self.dimensionX * 0.6), int(self.dimensionY*0.75 - 50), quitbutton, quit)]
         self.selectedbutton = -1
     
     def startgame(self):
@@ -48,7 +46,7 @@ class EndScreen:
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.stamp, (10, 10))
             for i, text in enumerate(self.scorestatement):
-                self.screen.blit(text, (self.dimensionX * 0.45, 40 * (i + 1)))
+                self.screen.blit(text, (self.dimensionX * 0.45, 40 * (i + 5)))
             for i, b in enumerate(self.buttons):
                 b.show(self.selectedbutton == i)
             for event in pygame.event.get():

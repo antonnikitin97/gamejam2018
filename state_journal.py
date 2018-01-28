@@ -43,7 +43,7 @@ class Book:
                                                   (int(self.map.get_width() / 20), int(self.map.get_height()/10))).convert_alpha()
         self.pages[2].blit(westmap, (self.dimensionX/2 - westmap.get_width() - 5, 50))
         self.pages[3].blit(eastmap, (5, 50))
-        print(self.player.current_transmissions)
+        #print(self.player.current_transmissions)
         pygame.draw.line(self.pages[4], (0, 0, 0), (130, 0), (130, self.dimensionY))
         for i, transmission in enumerate(self.player.current_transmissions):
             id = transmission[0]
