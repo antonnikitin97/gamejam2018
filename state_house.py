@@ -202,7 +202,7 @@ class HouseScreen:
             self.overworld.options["OUT_OF"] += 1
             self.overworld.options["TOTAL_SYM"] += 5
             self.overworld.options["CORRECT_SYM"] += correct
-            self.player.remove_transmission(self.house)
+            self.player2.remove_transmission(self.house)
         self.is_in_receive = False
 
     def start_receiving_transmission(self):
