@@ -17,14 +17,14 @@ class Player:
         self.screenY = self.worldY
         self.speed = 10
         self.orient = 0
-        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)), (204, 152)) for i in range(1, 6)]
-        down_img = [pygame.transform.rotate(img[i], 90)for i in range(len(img))]
-        right_img = [pygame.transform.flip(img[i], True, False) for i in range(len(img))]
-        up_img = [pygame.transform.flip(down_img[i], False, True) for i in range(len(img))]
-        swimg = [pygame.transform.rotate(img[i], 45) for i in range(len(img))]
-        nwimg = [pygame.transform.rotate(img[i], 315) for i in range(len(img))]
-        neimg = [pygame.transform.rotate(up_img[i], 315) for i in range(len(img))]
-        seimg = [pygame.transform.rotate(up_img[i], 225) for i in range(len(img))]
+        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)).convert_alpha(), (204, 152)) for i in range(1, 6)]
+        down_img = [pygame.transform.rotate(img[i], 90).convert_alpha() for i in range(len(img))]
+        right_img = [pygame.transform.flip(img[i], True, False).convert_alpha() for i in range(len(img))]
+        up_img = [pygame.transform.flip(down_img[i], False, True).convert_alpha() for i in range(len(img))]
+        swimg = [pygame.transform.rotate(img[i], 45).convert_alpha() for i in range(len(img))]
+        nwimg = [pygame.transform.rotate(img[i], 315).convert_alpha() for i in range(len(img))]
+        neimg = [pygame.transform.rotate(up_img[i], 315).convert_alpha() for i in range(len(img))]
+        seimg = [pygame.transform.rotate(up_img[i], 225).convert_alpha() for i in range(len(img))]
         self.spritearray = [img, down_img, right_img, up_img,
                             nwimg, swimg, neimg, seimg]
         self.frame = 0
@@ -82,17 +82,20 @@ class Game:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\Images\World map.png'), (3000, 2550))
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\Images\World map.png'),
+                                          (3000, 2550)).convert_alpha()
         self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
-                                            (int(898/5), int(876/5)))
+                                            (int(898/5), int(876/5))).convert_alpha()
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
         self.house_states = []
         self.generate_house_locations()
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
-        self.arrow = pygame.image.load_extended('Assets\\Images\\arrow.png')
-        self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\arrow2.png'), (100, 100))
-        self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'), (int(417/2.5), int(188/2.5)))
+        self.arrow = pygame.image.load_extended('Assets\\Images\\arrow.png').convert_alpha()
+        self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\arrow2.png'),
+                                             (100, 100)).convert_alpha()
+        self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'),
+                                                (int(417/2.5), int(188/2.5))).convert_alpha()
         self.danger = False
         self.transmission_time = 300
         self.transmission_event = pygame.USEREVENT + 5
@@ -175,7 +178,7 @@ class Game:
 
             if color_pixel.r == 38 and color_pixel.g == 142 and color_pixel.b == 143:
                 self.danger = True
-                text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK)
+                text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20,20))
 
             housecollide = [-1, self.dimensionX]
@@ -190,7 +193,7 @@ class Game:
                         housecollide = [i, d]
             if housecollide[0] != -1:
                 text_surface = self.textfont.render('Press G to enter house {}'.format(housecollide[0]),
-                                                    False, WHITE, BLACK)
+                                                    False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20, 20))
                 house = self.house_list[housecollide[0]]
                 arrowx = house.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width() + house.visual.width)/2

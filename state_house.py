@@ -39,9 +39,11 @@ class HouseScreen:
         self.textfont = pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30)
         self.transmission = []
         self.transmission_received = False
-        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'), (960, 720))
-        self.bubble = pygame.image.load_extended('Assets\\GameJam\\speech.png')
-        self.router_birb = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'), (int(594/5), int(841/5)))
+        self.map = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'),
+                                          (960, 720)).convert_alpha()
+        self.bubble = pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha()
+        self.router_birb = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'),
+                                                  (int(594/5), int(841/5))).convert_alpha()
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
@@ -53,7 +55,7 @@ class HouseScreen:
 
     def load_symbols(self):
         scale_const = 0.4
-        imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png') for i in range(1, 20)]
+        imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png').convert_alpha() for i in range(1, 20)]
         return [pygame.transform.scale(img, (int(img.get_width() * scale_const),
                                              int(img.get_height() * scale_const))) for img in imgs]
     
