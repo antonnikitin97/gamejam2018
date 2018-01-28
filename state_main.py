@@ -114,6 +114,8 @@ class Game:
         self.tree = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Tree Translucent.png'),
                                            (int(2421/5), int(1977/5))).convert_alpha()
         self.player = Player(self.dimensionX, self.dimensionY)
+        self.player.worldX += self.oceanborderx
+        self.player.worldY += self.oceanbordery
         self.house_list = []
         self.house_states = []
         self.generate_house_locations()
@@ -252,11 +254,10 @@ class Game:
                 #find nearest house
                 nearest = min(broadcasting, key = lambda h: distance(Point(h.worldX, h.worldY), Point(self.player.worldX, self.player.worldY)))
                 #find rotation
-                rot = -math.degrees(math.atan2(nearest.worldY - self.player.worldY, nearest.worldX - self.player.worldX))
-                if rot < 0:
-                    rot += 360
+                rot = -math.degrees(math.atan2(nearest.worldY - self.player.worldY, nearest.worldX - self.player.worldX)) % 360
                 if distance(Point(nearest.worldX, nearest.worldY), Point(self.player.worldX, self.player.worldY)) + 300 > math.sqrt((self.dimensionX/2)**2 + (self.dimensionY/2)**2):
-                    self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90), self.rotatePoint((self.dimensionX/2, self.dimensionY/2), (int(self.dimensionX/2)-50, 100), -rot + 90))
+                    self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90).convert_alpha(),
+                                     self.rotatePoint((self.dimensionX/2, self.dimensionY/2), (int(self.dimensionX/2)-50, 100), -rot + 90))
 
                 #TODO: if any house on screen is broadcasting, don't show an arrow
 

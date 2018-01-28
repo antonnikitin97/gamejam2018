@@ -50,6 +50,7 @@ class HouseScreen:
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
+        self.player2.speed /= 2
         self.is_bubble_displayed = 0
         button_offset = 400
         self.button_back = pygame.image.load_extended('Assets\\Images\\symbutt.png')
