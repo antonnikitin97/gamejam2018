@@ -51,6 +51,12 @@ class Player:
             if d[0] == dest:
                 return d[1]
         return None
+    def remove_transmission(self, dest):
+        for d in self.current_transmissions:
+            if d[0] == dest:
+                del d
+                return
+
     
     def move(self, pressed_keys, projected_box=None):
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))

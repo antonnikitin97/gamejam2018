@@ -184,6 +184,7 @@ class HouseScreen:
             self.overworld.options["OUT_OF"] += 1
             self.overworld.options["TOTAL_SYM"] += 5
             self.overworld.options["CORRECT_SYM"] += correct
+            self.player.remove_transmission(self.house)
         self.is_in_receive = False
 
     def start_receiving_transmission(self):
@@ -266,10 +267,6 @@ class HouseScreen:
                                 self.display_next_sequence()
                     if event.key == K_d and not self.current_channel.get_busy():
                         self.current_delivery = self.start_delivering_transmission()
-                        if not self.house_obj.broadcast_status[1]:
-                            print('wrong house')
-                        else:
-                            print('right house')
                     if event.key == K_w:
                         self.leavehouse()
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
