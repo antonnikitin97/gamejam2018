@@ -50,11 +50,20 @@ class Book:
             self.pages[4].blit(self.smallsymbols[int((id - (id % 5)) / 5)], (10, 150 + i * 60))
             self.pages[4].blit(self.smallsymbols[int(id % 5)], (65, 150 + i * 60))
             for j, no in enumerate(transmission[1]):
-                self.pages[4].blit(self.smallsymbols[no], (150 + j * 55, 200 + i * 60))
+                self.pages[4].blit(self.smallsymbols[no], (150 + j * 55, 150 + i * 60))
         for i in range(len(self.pages)):
             self.pages[i].blit(self.textfont.render(titles[i], True, (0, 0, 0), (255, 255, 255)), (10, 10))
             self.pages[i].blit(self.textfont.render("Pg. " + str(i + 1), True, (0, 0, 0), (255, 255, 255)), (10, self.dimensionY - 45))
         self.pageselector = 0
+        self.pagebckgrd = pygame.Surface((self.dimensionX, self.dimensionY))
+        self.pagebckgrd.fill((255, 255, 255))
+        leftpage = pygame.transform.scale(pygame.image.load_extended('Assets/Images/Page 1.png'),
+                                          (int(self.dimensionX/2), self.dimensionY))
+        rightpage = pygame.transform.scale(pygame.image.load_extended('Assets/Images/Page 2.png'),
+                                           (int(self.dimensionX / 2), self.dimensionY))
+        self.pagebckgrd.blit(leftpage, (self.dimensionX/2 - leftpage.get_width(), 0))
+        self.pagebckgrd.blit(rightpage, (self.dimensionX / 2, 0))
+        self.pagebckgrd = self.pagebckgrd.convert_alpha()
     
     def leavejournal(self):
         self.done = True
@@ -63,8 +72,13 @@ class Book:
     def main_loop(self):
         self.done = False
         while not self.done:
-            self.screen.blit(self.pages[self.pageselector], (0, 0))
-            self.screen.blit(self.pages[(self.pageselector + 1) % len(self.pages)], (self.dimensionX / 2, 0))
+            self.screen.blit(self.pagebckgrd, (0, 0))
+            leftpage = self.pages[self.pageselector]
+            rightpage = self.pages[(self.pageselector + 1) % len(self.pages)]
+            self.screen.blit(pygame.transform.scale(leftpage, (leftpage.get_width() - 200, leftpage.get_height() - 100)),
+                             (100, 100))
+            self.screen.blit(pygame.transform.scale(rightpage, (rightpage.get_width() - 200, rightpage.get_height() - 100)),
+                             (self.dimensionX / 2 + 100, 100))
             pygame.display.flip()
             for e in pygame.event.get():
                 if e.type == QUIT:
