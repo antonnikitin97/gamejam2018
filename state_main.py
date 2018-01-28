@@ -17,7 +17,8 @@ class Player:
         self.screenY = dimensionY / 2
         self.speed = 10
         self.orient = 0
-        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)).convert_alpha(), (204, 152)) for i in range(1, 6)]
+        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)).convert_alpha(),
+                                      (204, 152)) for i in range(1, 6)]
         down_img = [pygame.transform.rotate(img[i], 90).convert_alpha() for i in range(len(img))]
         right_img = [pygame.transform.flip(img[i], True, False).convert_alpha() for i in range(len(img))]
         up_img = [pygame.transform.flip(down_img[i], False, True).convert_alpha() for i in range(len(img))]
@@ -130,6 +131,8 @@ class Game:
         self.transmission_event = pygame.USEREVENT + 5
         self.initial = True
         pygame.time.set_timer(self.transmission_event, self.transmission_time * 1000)
+        self.start = 0
+        self.paused = False
         
     def rotatePoint(self, centerPoint, point, angle):
         """Rotates a point around another centerPoint. Angle is in degrees.
@@ -195,10 +198,12 @@ class Game:
     def pause(self):
         self.options["TIME"] += time.time() - self.start
         print("Timer paused at", self.options["TIME"])
+        self.paused = True
     
     def unpause(self):
         self.start = time.time()
         print("Timer unpaused at", self.options["TIME"])
+        self.paused = False
 
     def main_loop(self):
         self.done = False
@@ -262,7 +267,14 @@ class Game:
                                      self.rotatePoint((self.dimensionX/2, self.dimensionY/2), (int(self.dimensionX/2)-50, 100), -rot + 90))
 
                 #TODO: if any house on screen is broadcasting, don't show an arrow
-
+            
+            scoretext = self.textfont.render("Score: " + str(self.options["DELIVERED"]),
+                                             True, BLACK, WHITE).convert_alpha()
+            timetext = self.textfont.render("Time: {:0.2f}".format(self.options["TIME"] + (time.time() - self.start) * (not self.paused)),
+                                            True, BLACK, WHITE).convert_alpha()
+            self.screen.blit(scoretext, (self.dimensionX - scoretext.get_width() - 5, 5))
+            self.screen.blit(timetext, (self.dimensionX - timetext.get_width() - 5, 40))
+            
             for event in pygame.event.get():
                 if event.type == QUIT:
                     quit()
