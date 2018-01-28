@@ -22,7 +22,7 @@ class Button:
             self.pressfunction()
 
 class ButtonWithStuffOn:
-    def __init__(self, screen, x, y, sprite, image, sound, pressfunction):
+    def __init__(self, screen, x, y, sprite, image, sound, pressfunction, id):
         self.screen = screen
         self.x = x
         self.y = y
@@ -35,6 +35,8 @@ class ButtonWithStuffOn:
                                     sprite.get_width(), sprite.get_height())
         self.pressfunction = pressfunction
         self.channel = pygame.mixer.Channel(3)
+        self.id = id
+        self.was_pressed = False
     
     def show(self, highlight):
         mouseover = self.collider.collidepoint(pygame.mouse.get_pos())
@@ -45,5 +47,8 @@ class ButtonWithStuffOn:
         else:
             self.screen.blit(self.sprite, (self.x - (self.sprite.get_width() / 2), self.y))
         self.screen.blit(self.image, ((self.x - self.image.get_width()/2), self.y + 50 + self.image.get_height()/2))
-        if pygame.mouse.get_pressed()[0] and mouseover:
-            self.pressfunction()
+        if pygame.mouse.get_pressed()[0] and mouseover and not self.was_pressed:
+            self.was_pressed = True
+        elif (not pygame.mouse.get_pressed()[0]) and mouseover and self.was_pressed:
+            self.pressfunction(self.id)
+            self.was_pressed = False
