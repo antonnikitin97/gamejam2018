@@ -278,7 +278,7 @@ class HouseScreen:
                 if event.type == QUIT:
                     exit()
                 if event.type == KEYDOWN:
-                    if event.key == K_f:
+                    if event.key == K_g:
                         if not len(self.waiting_sounds):
                             if not self.transmission_received and self.house_obj.broadcast_status[0] and not self.is_in_receive:
                                 chan = self.start_receiving_transmission()
