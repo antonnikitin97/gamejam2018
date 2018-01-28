@@ -23,6 +23,7 @@ class HouseScreen:
         self.waiting_sounds = []
         self.current_channel = pygame.mixer.Channel(0)
         self.show_tips = False
+        self.give_transmission = False
         self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
         self.placememt_rect_x = 0
         self.placememt_rect_y = 700
@@ -152,6 +153,7 @@ class HouseScreen:
         #todo: put 
     def display_delivery_options(self, options):
         butts = []
+        self.give_transmission = True
         for i in range(len(options)):
             b1 = button.ButtonWithStuffOn(self.screen, int(i*self.overworld.dimensionX/3) + self.button_back.get_width()/2, 480, self.button_back, self.symbols[options[i]], \
                 self.noises[options[i]], self.optionselected, options[i])
@@ -251,7 +253,6 @@ class HouseScreen:
         self.placememt_rect_x = 0
         self.done = False
         while not self.done:
-            self.current_time = self.clock.tick(70) / 1000
             self.show_tips = False
             if self.birb_collider.colliderect(self.player2.collision):
                 self.show_tips = True
@@ -310,9 +311,7 @@ class HouseScreen:
             # for x in range(4):
             #     self.screen.blit(self.spritearray[0][x], (400, 400))
 
-            self.screen.blit(self.spritearray[0][self.current_sprite], (-40, self.placememt_rect_y))
-
-            self.sprite_help_index += 0.1
+            self.sprite_help_index += 0.05
             if self.sprite_help_index >= self.sprite_help_limit:
                 self.sprite_help_index = 0
                 # self.screen.blit(self.spritearray[0][self.current_sprite - 1], (400, 400))
@@ -321,19 +320,21 @@ class HouseScreen:
                 if self.current_sprite > 3:
                     self.current_sprite = 0
 
-            if self.show_tips:
-                if self.placememt_rect_y <= 460:
-                    self.placememt_rect_y += 0
+            if not self.is_in_receive:
+                self.screen.blit(self.spritearray[0][self.current_sprite], (-40, self.placememt_rect_y))
+                if self.show_tips:
+                    if self.placememt_rect_y <= 460:
+                        self.placememt_rect_y += 0
+                    else:
+                        self.placememt_rect_y -= 5
+                        print(self.placememt_rect_y)
+                        # if self.placememt_rect_y >= 600:
+                        #     self.placememt_rect_y += 0
+                        # self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
+                        # print("TIPS!")
                 else:
-                    self.placememt_rect_y -= 10
-                    print(self.placememt_rect_y)
-                    # if self.placememt_rect_y >= 600:
-                    #     self.placememt_rect_y += 0
-                    # self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
-                    # print("TIPS!")
-            else:
-                if self.placememt_rect_y != self.default_placement:
-                    self.placememt_rect_y += 10
-                    # self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
+                    if self.placememt_rect_y != self.default_placement:
+                        self.placememt_rect_y += 5
+                        # self.placememt_rect = pygame.Rect(self.placememt_rect_x, self.placememt_rect_y, int(594 / 5), int(841 / 5))
             pygame.display.flip()
         return self.nextstate
