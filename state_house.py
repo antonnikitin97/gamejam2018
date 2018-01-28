@@ -8,7 +8,6 @@ import button
 from pygame.locals import *
 
 TRANSMISSION_EVENT = 10000
-num_houses = 15
 sound_endevent = pygame.event.Event(TRANSMISSION_EVENT)
 noises = 0
 symbols = 0
@@ -57,7 +56,7 @@ class HouseScreen:
 
     def load_symbols(self):
         scale_const = 0.4
-        imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png').convert_alpha() for i in range(1, 20)]
+        imgs = [pygame.image.load_extended('Assets\\symbols\\' + str(i) + '.png').convert_alpha() for i in range(1, 21)]
         return [pygame.transform.scale(img, (int(img.get_width() * scale_const),
                                              int(img.get_height() * scale_const))) for img in imgs]
     
@@ -147,7 +146,7 @@ class HouseScreen:
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):
         while True:
-            destination = random.randint(0, num_houses)
+            destination = random.randint(0, len(self.overworld.house_list))
             if destination != from_id:
                 break
         return destination, self.get_location_encoding(destination) + self.music_seq(length)
@@ -156,6 +155,7 @@ class HouseScreen:
         #make a new transmission
         dest, transmission = self.make_transmission(self.house, 5)
         self.overworld.player.add_transmission(dest, transmission)
+        print(dest, len(self.overworld.house_list))
         self.overworld.house_list[dest].broadcast_status = (self.overworld.house_list[dest].broadcast_status[0], True)
         print(transmission)
         #copy it over
