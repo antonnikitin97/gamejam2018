@@ -11,6 +11,8 @@ class Menu:
         self.options = options
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
+        self.bckgrd = pygame.transform.scale(pygame.image.load_extended('Assets/Images/Title Screen.png').convert_alpha(),
+                                             (self.dimensionX, self.dimensionY))
         self.gamestate = None
         self.game = None
         BLACK = (0, 0, 0)
@@ -28,6 +30,7 @@ class Menu:
         self.selectedbutton = 0
     def load_game(self):
         self.game = state_main.Game(self.screen, self.options)
+        
     def startgame(self):
         self.screen.blit(pygame.font.Font('Assets\OpenSans-Regular.ttf', 30).render('Loading...', True, (0,0,0), (255, 255, 255)), (400, 600))
         pygame.display.flip()
@@ -46,6 +49,7 @@ class Menu:
         self.done = False
         while not self.done:
             self.screen.fill((255, 255, 255))
+            self.screen.blit(self.bckgrd, (0, 0))
             for i, b in enumerate(self.buttons):
                 b.show(self.selectedbutton == i)
             for event in pygame.event.get():

@@ -10,6 +10,8 @@ class Menu:
         self.options = options
         self.dimensionX = self.screen.get_width()
         self.dimensionY = self.screen.get_height()
+        self.backgrd = pygame.image.load_extended('Assets/Images/Tree Translucent.png').convert_alpha()
+        self.backgrd = pygame.transform.scale(self.backgrd, (int(self.backgrd.get_width()/2.1), int(self.backgrd.get_height()/2.1)))
         self.prevstate = statein
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
@@ -19,15 +21,15 @@ class Menu:
         menubutton = textfont.render("QUIT TO MAIN MENU", True, BLACK, WHITE)
         if backtogame:
             playbutton = textfont.render("RETURN TO GAME", True, BLACK, WHITE)
-            self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY/2 - 50, fullscreenbutton, self.togglefullscreen),
-                            Button(screen, self.dimensionX / 2, self.dimensionY/2, menubutton,
+            self.buttons = [Button(screen, self.dimensionX * 0.2, self.dimensionY/2 - 50, fullscreenbutton, self.togglefullscreen),
+                            Button(screen, self.dimensionX  * 0.2, self.dimensionY/2, menubutton,
                                    self.tomainmenu),
-                            Button(screen, self.dimensionX / 2, self.dimensionY/2 + 50, playbutton, self.leaveoptions)]
+                            Button(screen, self.dimensionX * 0.2, self.dimensionY/2 + 50, playbutton, self.leaveoptions)]
             self.selectedbutton = len(self.buttons) - 1
         else:
             self.buttons = [
-                Button(screen, self.dimensionX / 2, self.dimensionY/2 - 25, fullscreenbutton, self.togglefullscreen),
-                Button(screen, self.dimensionX / 2, self.dimensionY/2 + 25, menubutton,
+                Button(screen, self.dimensionX * 0.2, self.dimensionY/2 - 25, fullscreenbutton, self.togglefullscreen),
+                Button(screen, self.dimensionX * 0.2, self.dimensionY/2 + 25, menubutton,
                        self.leaveoptions)]
             self.selectedbutton = -1
     
@@ -49,6 +51,7 @@ class Menu:
     def main_loop(self):
         while not self.done:
             self.screen.fill((255, 255, 255))
+            self.screen.blit(self.backgrd, (self.dimensionX * 0.4, -190))
             for i, b in enumerate(self.buttons):
                 b.show(self.selectedbutton == i)
             for event in pygame.event.get():
