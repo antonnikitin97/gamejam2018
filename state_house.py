@@ -144,6 +144,7 @@ class HouseScreen:
         #make a new transmission
         dest, transmission = self.make_transmission(self.house, 5)
         self.overworld.player.add_transmission(dest, transmission)
+        self.overworld.house_list[dest].broadcast_status = (self.overworld.house_list[dest].broadcast_status[0], True)
         print(transmission)
         #copy it over
         for note in transmission:

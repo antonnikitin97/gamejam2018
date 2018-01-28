@@ -32,6 +32,7 @@ class Player:
         self.visual = pygame.Rect((self.screenX - 76, self.screenY - 76, 152, 152))
         self.collision = pygame.Rect((self.worldX - 76, self.worldY - 76, 152, 152))
         self.projected_collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
+        self.current_transmissions = []
     
     def get_sprite(self):
         return self.spritearray[self.orient][self.frame]
@@ -41,6 +42,11 @@ class Player:
             return
         else:
             self.current_transmissions.append((dest, transmission))
+    def get_transmission(self, dest):
+        for d in self.current_transmissions:
+            if d[0] == dest:
+                return d[1]
+        return None
     
     def move(self, pressed_keys, projected_box=None):
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
