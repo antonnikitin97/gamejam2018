@@ -119,6 +119,8 @@ class Player:
 class Game:
     def __init__(self, screen, options):
         self.screen = screen
+        self.danger_limit = 1000
+        self.danger_time = 0
         self.options = options
         self.options["TOTAL"] = 0
         self.options["DELIVERED"] = 0
@@ -265,6 +267,12 @@ class Game:
                    
             if not self.islandrect.colliderect(self.player.collision):
                 self.danger = True
+                self.danger_time += 10
+
+                if self.danger_time >= self.danger_limit:
+                    self.nextstate = state_gameover.EndScreen(self.screen, self.options, False, 1010101010)
+                    self.done = True
+                    print("BLEH!")
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20,20))
 
