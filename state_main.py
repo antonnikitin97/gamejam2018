@@ -132,7 +132,7 @@ class Game:
         self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'),
                                                 (int(417/2.5), int(188/2.5))).convert_alpha()
         self.danger = False
-        self.transmission_time = 300
+        self.transmission_time = 30
         self.transmission_event = pygame.USEREVENT + 5
         self.initial = True
         pygame.time.set_timer(self.transmission_event, self.transmission_time * 1000)
@@ -286,7 +286,7 @@ class Game:
 
                 #TODO: if any house on screen is broadcasting, don't show an arrow
             
-            scoretext = self.textfont.render("Score: " + str(self.options["DELIVERED"]),
+            scoretext = self.textfont.render("Score: " + str(self.options["TOTAL"]),
                                              True, BLACK, WHITE).convert_alpha()
             timetext = self.textfont.render("Time: {:0.2f}".format(self.options["TIME"] + (time.time() - self.start) * (not self.paused)),
                                             True, BLACK, WHITE).convert_alpha()

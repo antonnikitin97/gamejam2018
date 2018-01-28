@@ -146,36 +146,53 @@ class HouseScreen:
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):
         while True:
-            destination = random.randint(0, len(self.overworld.house_list))
+            destination = random.randint(0, len(self.overworld.house_list)-1)
             if destination != from_id:
                 break
         return destination, self.get_location_encoding(destination) + self.music_seq(length)
 
     def mark_corrections(self):
         #TODO: special notification if the house is totally wrong
+        if self.overworld.player.get_transmission(self.house) is None:
+            wrongtext = self.textfont.render("Wrong House!", True, (0, 0, 0), (255, 255, 255))
+            self.screen.blit(wrongtext, (self.overworld.dimensionX/2 - wrongtext.get_width()/2, transmission_offset + 50))
+            if self.is_in_receive:
+                #update the score - minus 5000 points?
+                self.overworld.options["TOTAL"] -= 5000
+                self.overworld.options["WRONG"] += 1
+            self.is_in_receive = False
+            return
         offs = 0
+        correct = 0
         for i, b in enumerate(self.currently_entered_sequence):
             #for each symbol, if it matches then put a tick above it
             #else put a cross
             print(self.currently_entered_sequence, self.overworld.player.get_transmission(self.house))
             mark = self.tick if b == self.overworld.player.get_transmission(self.house)[i] else self.cross
             self.screen.blit(mark, (transmission_offset + offs + 10, transmission_offset + 50))
-            self.screen.blit(self.textfont.render("0/5 you're shit at this", True, (0, 0, 0), (255, 255, 255)), (300, 350))
             offs += 155
+            if b == self.overworld.player.get_transmission(self.house)[i]:
+                correct +=1
+        if self.is_in_receive:
+            self.overworld.options["TOTAL"] += (1000*correct)
+            self.overworld.options["TOTAL"] += (3000 if correct == 5 else 0)
+        self.is_in_receive = False
+
     def start_receiving_transmission(self):
         #make a new transmission
         dest, transmission = self.make_transmission(self.house, 5)
-        print(transmission)
+        #print(transmission)
         self.overworld.player.add_transmission(dest, transmission)
-        print(dest, len(self.overworld.house_list))
+        #print(dest, len(self.overworld.house_list))
+        self.overworld.house_list[self.house].broadcast_status = (False, self.overworld.house_list[self.house].broadcast_status[1])
         self.overworld.house_list[dest].broadcast_status = (self.overworld.house_list[dest].broadcast_status[0], True)
-        print(transmission)
+       # print(transmission)
         #copy it over
         for note in transmission:
             #print('hi')
             self.waiting_sounds.append(note)
         #start off displaying the parts of the transmission
-        print(self.noises)
+        #print(self.noises)
         self.transmission_received = True
         self.is_bubble_displayed = -1
         self.display_next_sequence()
@@ -197,6 +214,7 @@ class HouseScreen:
     def leavehouse(self):
         self.nextstate = self.overworld
         self.is_in_receive = False
+        self.has_finished_inputting = False
         self.currently_entered_sequence = []
         self.done = True
 
@@ -249,7 +267,7 @@ class HouseScreen:
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
                 #print('aaaaa')
                 self.display_next_sequence()
-            if self.is_in_receive:
+            if self.is_in_receive or self.has_finished_inputting:
                 for i, b in enumerate(self.buttons):
                     if not self.has_finished_inputting:
                         b.show(0)
