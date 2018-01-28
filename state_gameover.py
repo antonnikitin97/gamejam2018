@@ -10,32 +10,29 @@ class EndScreen:
         self.nextstate = None
         self.screen = screen
         self.options = options
+        print(options)
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.victory = victory
-        self.points = options["SCORE"]
         self.time = timetaken
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
         textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
-        if victory:
-            self.stamp = pygame.image.load_extended('Assets/Images/Bird Frame 1.png')  # Standin image
-            self.scorestatement = [textfont.render("GOOD JOB, FINE AVIAN", True, BLACK, WHITE),
-                                   textfont.render("", True, BLACK, WHITE),
-                                   textfont.render(str(self.time), True, BLACK, WHITE)]
-        else:
-            self.stamp = pygame.image.load_extended('Assets/Images/Bird standing.png') # Standin image
-            self.scorestatement = [textfont.render("404 ERROR:", True, BLACK, WHITE),
-                                   textfont.render("BIRD NOT FOUND", True, BLACK, WHITE),
-                                   textfont.render(str(self.time), True, BLACK, WHITE)]
+        self.stamp = pygame.image.load_extended('Assets/Images/Bird Frame 1.png')  # Standin image
+        self.scorestatement = [textfont.render("GOOD JOB, FINE AVIAN", True, BLACK, WHITE),
+                               textfont.render("{}/{} Symbols delivered correctly".format(self.options["CORRECT_SYM"],
+                                                                                          self.options["TOTAL_SYM"]),
+                                               True, BLACK, WHITE),
+                               textfont.render("In a time of {:0.2f}".format(self.options["TIME"]), True, BLACK, WHITE),
+                               textfont.render("FINAL SCORE: " + str(self.options["TOTAL"]), True, BLACK, WHITE)]
         self.stamp = pygame.transform.scale(self.stamp, (200, 300))  # Temporary shoehorning
         # Standin for buttons as they come
         playbutton = textfont.render("PLAY AGAIN", True, BLACK, WHITE)
         menubutton = textfont.render("QUIT TO MENU", True, BLACK, WHITE)
         quitbutton = textfont.render("QUIT GAME", True, BLACK, WHITE)
-        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY - 150, playbutton, self.startgame),
-                        Button(screen, self.dimensionX / 2, self.dimensionY - 100, menubutton, self.tomenu),
-                        Button(screen, self.dimensionX / 2, self.dimensionY - 50, quitbutton, quit)]
+        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY/2 - 150, playbutton, self.startgame),
+                        Button(screen, self.dimensionX / 2, self.dimensionY/2 - 100, menubutton, self.tomenu),
+                        Button(screen, self.dimensionX / 2, self.dimensionY/2 - 50, quitbutton, quit)]
         self.selectedbutton = -1
     
     def startgame(self):

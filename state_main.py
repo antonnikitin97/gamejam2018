@@ -219,19 +219,20 @@ class Game:
         #set it to be currently broadcasting
     
     def endgame(self, victory):
+        self.pause()
         self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory, time.time() - self.start)
         self.done = True
     
     def enterhouse(self, which):
         self.done = True
         print("Entered house", which)
-        self.nextstate = self.house_states[which]
         self.pause()
+        self.nextstate = self.house_states[which]
     
     def enteroptions(self):
         self.done = True
-        self.nextstate = state_options.Menu(self.screen, self.options, self)
         self.pause()
+        self.nextstate = state_options.Menu(self.screen, self.options, self)
     
     def enterjournal(self):
         self.done = True
@@ -336,6 +337,7 @@ class Game:
              if self.options["TOTAL_SYM"] != 0 else 1)), True, BLACK, WHITE).convert_alpha()
             timetext = self.textfont.render("Time: {:0.2f}".format(self.options["TIME"] + (time.time() - self.start) * (not self.paused)),
                                             True, BLACK, WHITE).convert_alpha()
+            print(self.options)
             self.screen.blit(scoretext, (self.dimensionX - scoretext.get_width() - 5, 5))
             self.screen.blit(scoretext2, (self.dimensionX - scoretext2.get_width() - 5, 40))
             self.screen.blit(scoretext3, (self.dimensionX - scoretext2.get_width() - 5, 75))
