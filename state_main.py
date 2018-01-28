@@ -10,6 +10,28 @@ import time
 import math
 from entity import Entity
 
+class Dude:
+    def __init__(self, px, py):
+        self.worldX = px
+        self.worldY = py
+        self.speed = 10
+        self.orient = 0
+        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Guy Frame {}.png'.format(i)).convert_alpha(),
+                                      (204, 152)) for i in range(1, 5)]
+        self.spritearray = [img]
+        self.frame = random.randint(0, 4)
+        self.lastspritechangetime = 0
+    
+    def get_sprite(self):
+        return self.spritearray[self.orient][self.frame]
+
+    def move(self):
+        if time.time() - self.lastspritechangetime > 0.05:
+            self.frame = (self.frame + 1) % len(self.spritearray[0])
+            self.lastspritechangetime = time.time()
+            self.worldX += random.choice([-5, 5, 0])
+            self.worldY += random.choice([-5, 5, 0])
+
 class Player:
     def __init__(self, dimensionX, dimensionY):
         self.worldX = 3671
@@ -89,7 +111,7 @@ class Player:
         elif projected_box.contains(self.projected_collision):
             self.worldX += xdiff
             self.worldY += ydiff
-        if time.time() - self.lastspritechangetime > 0.02:
+        if time.time() - self.lastspritechangetime > 0.05:
             self.frame = (self.frame + 1) % len(self.spritearray[0])
             self.lastspritechangetime = time.time()
 
@@ -110,6 +132,7 @@ class Game:
         self.oceantile = pygame.image.load_extended('Assets\Images\WavesSolo.png').convert_alpha()
         self.oceanborderx = 1035
         self.oceanbordery = 987
+        self.dudes = [Dude(random.randint(500, self.islandmap.get_width()-500), random.randint(500, self.islandmap.get_width()-500)) for _ in range(10)]
         self.islandrect = pygame.Rect(self.oceanborderx, self.oceanbordery,
                                       self.islandmap.get_width(), self.islandmap.get_height())
         self.map = pygame.Surface((self.islandmap.get_width() + self.oceanborderx * 2,
@@ -297,10 +320,14 @@ class Game:
             #self.screen.fill(0, self.player.visual)  # for debugging hitboxes
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
-            
+            for dude in self.dudes:
+                dude.move()
+                dudesprite = dude.get_sprite()
+                self.screen.blit(dudesprite, (dude.worldX - self.player.worldX, dude.worldY - self.player.worldY))
             playersprite = self.player.get_sprite()
             self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
                                             (self.dimensionY - playersprite.get_height())/2))
+            
             
             scoretext = self.textfont.render("Score: {}/{}".format(self.options["DELIVERED"], self.options["TOTAL"]),
                                              True, BLACK, WHITE).convert_alpha()
