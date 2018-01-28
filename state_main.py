@@ -96,9 +96,23 @@ class Game:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.map = pygame.image.load_extended('Assets\Images\WorldMap.png').convert_alpha()
+        self.islandmap = pygame.image.load_extended('Assets\Images\WorldMap.png').convert_alpha()
+        self.oceantile = pygame.image.load_extended('Assets\Images\WavesSolo.png').convert_alpha()
+        self.oceanborderx = 1035
+        self.oceanbordery = 987
+        self.islandrect = pygame.Rect(self.oceanborderx, self.oceanbordery,
+                                      self.islandmap.get_width(), self.islandmap.get_height())
+        self.map = pygame.Surface((self.islandmap.get_width() + self.oceanborderx * 2,
+                                   self.islandmap.get_height() + self.oceanbordery * 2)).convert_alpha(self.islandmap)
+        self.map.fill((0, 0, 0, 0))
+        for i in range(0, self.map.get_width(), self.oceantile.get_width()):
+            for j in range(0, self.map.get_height(), self.oceantile.get_height()):
+                self.map.blit(self.oceantile, (i, j))
+        self.map.blit(self.islandmap, (self.oceanborderx, self.oceanbordery))
         self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
                                             (int(898/5), int(876/5))).convert_alpha()
+        self.tree = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Tree Translucent.png'),
+                                           (int(2421/5), int(1977/5))).convert_alpha()
         self.player = Player(self.dimensionX, self.dimensionY)
         self.house_list = []
         self.house_states = []
@@ -126,19 +140,25 @@ class Game:
 
     def generate_house_locations(self):
         valid_points = generate_house_locations(self.house,
-                                                self.map.get_width()/2, self.map.get_height()/2,
-                                                min(self.map.get_width(), self.map.get_height())/2,
+                                                self.map.get_width() / 2, self.map.get_height() / 2,
+                                                min(self.islandmap.get_width(), self.islandmap.get_height()) / 2,
                                                 10)
         for i, house in enumerate(valid_points):
             tuple = (house.x, house.y)
             self.house_list.append(House(*tuple, self.house))
-        print(self.house_list)
+        #print(self.house_list)
         self.house_list = sorted(self.house_list, key=lambda house: house.worldY)
-        print(self.house_list)
-
+        #print(self.house_list)
+        self.house_states = []
+        
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i]))
+        
+        for pos in generate_house_locations(self.tree, self.islandmap.get_width() * 0.7 + self.oceanborderx,
+                                                       self.islandmap.get_height() * 0.3 + self.oceanbordery,
+                                            self.islandmap.get_height() * 0.3, 3):
+            self.map.blit(self.tree, (pos.x, pos.y))
     
     def fire_transmission(self):
         self.initial = False
@@ -190,7 +210,7 @@ class Game:
             self.screen.blit(self.map, ((self.dimensionX / 2) - self.player.worldX,
                                         (self.dimensionY / 2) - self.player.worldY))
             
-            if not self.map.get_rect().colliderect(self.player.collision):
+            if not self.islandrect.colliderect(self.player.collision):
                 self.danger = True
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20,20))
