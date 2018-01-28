@@ -73,9 +73,10 @@ class Player:
 
 
 class Game:
-    def __init__(self, screen):
+    def __init__(self, screen, options):
         pygame.font.init()
         self.screen = screen
+        self.options = options
         self.done = False
         self.nextstate = None
         self.dimensionX = screen.get_width()
@@ -94,14 +95,15 @@ class Game:
         self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'), (int(417/2.5), int(188/2.5)))
         self.danger = False
         self.transmission_time = 300
-        self.transmission_event =pygame.USEREVENT+5
+        self.transmission_event = pygame.USEREVENT + 5
         self.initial = True
-        pygame.time.set_timer(self.transmission_event, self.transmission_time*1000)
-    def rotatePoint(self,centerPoint,point,angle):
+        pygame.time.set_timer(self.transmission_event, self.transmission_time * 1000)
+        
+    def rotatePoint(self, centerPoint, point, angle):
         """Rotates a point around another centerPoint. Angle is in degrees.
         Rotation is counter-clockwise"""
         angle = math.radians(angle)
-        temp_point = point[0]-centerPoint[0] , point[1]-centerPoint[1]
+        temp_point = point[0] - centerPoint[0] , point[1] - centerPoint[1]
         temp_point = ( temp_point[0]*math.cos(angle)-temp_point[1]*math.sin(angle) , temp_point[0]*math.sin(angle)+temp_point[1]*math.cos(angle))
         temp_point = temp_point[0]+centerPoint[0] , temp_point[1]+centerPoint[1]
         return temp_point
@@ -120,10 +122,10 @@ class Game:
 
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
-            self.house_states.append(state_house.HouseScreen(self.screen, self, i))
+            self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i))
     
     def endgame(self, victory):
-        self.nextstate = state_gameover.EndScreen(self.screen, victory, -1234567890)
+        self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory, -1234567890)
         self.done = True
     
     def enterhouse(self, which):
@@ -133,7 +135,7 @@ class Game:
     
     def enteroptions(self):
         self.done = True
-        self.nextstate = state_options.Menu(self.screen, self)
+        self.nextstate = state_options.Menu(self.screen, self.options, self)
     
     def fire_transmission(self):
         self.initial = False

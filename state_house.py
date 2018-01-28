@@ -2,7 +2,7 @@ from random import randint
 import random
 import time
 import pygame
-import state_main
+import state_options
 import copy
 from pygame.locals import *
 
@@ -13,8 +13,9 @@ noises = 0
 symbols = 0
 transmission_offset = 100
 class HouseScreen:
-    def __init__(self, screen, overworld, which):
+    def __init__(self, screen, options, overworld, which):
         self.screen = screen
+        self.options = options
         self.done = False
         self.house = which
         self.waiting_sounds = []
@@ -118,6 +119,10 @@ class HouseScreen:
         self.current_channel.play(self.noises[element])
         self.transmission.append(element)
         
+    def enteroptions(self):
+        self.done = True
+        self.nextstate = state_options.Menu(self.screen, self.options, self)
+    
     def leavehouse(self):
         self.nextstate = self.overworld
         self.done = True
@@ -161,6 +166,8 @@ class HouseScreen:
                                 self.display_next_sequence()
                     if event.key == K_w:
                         self.leavehouse()
+                    if event.key == K_ESCAPE:
+                        self.enteroptions()
 
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
                 #print('aaaaa')

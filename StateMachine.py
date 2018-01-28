@@ -27,15 +27,15 @@ def fadeout():
 		pygame.display.flip() # Flip the whole screen at each frame.
 
 def run():
-	pygame.init()
-	global screen
-	screen = pygame.display.set_mode((960, 720))
-
-	menustate = state_main.Game(screen)
-
-	state = menustate
-	while True:
-		state = state.main_loop()
-		fadeout()
+    pygame.init()
+    global screen
+    screen = pygame.display.set_mode((960, 720))
+    initialoptions = {"FULLSCREEN": False,
+                      "SOUND": True}
+    menustate = state_menu.Menu(screen, initialoptions)
+    state = menustate
+    while True:
+        state = state.main_loop()
+        fadeout()
 
 run()

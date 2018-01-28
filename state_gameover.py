@@ -5,10 +5,11 @@ from button import Button
 
 
 class EndScreen:
-    def __init__(self, screen, victory, points):
+    def __init__(self, screen, options, victory, points):
         self.done = False
         self.nextstate = None
         self.screen = screen
+        self.options = options
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.victory = victory
@@ -37,11 +38,11 @@ class EndScreen:
         self.selectedbutton = -1
     
     def startgame(self):
-        self.nextstate = state_main.Game(self.screen)
+        self.nextstate = state_main.Game(self.screen, self.options)
         self.done = True
     
     def tomenu(self):
-        self.nextstate = state_menu.Menu(self.screen)
+        self.nextstate = state_menu.Menu(self.screen, self.options)
         self.done = True
     
     def main_loop(self):

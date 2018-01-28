@@ -1,14 +1,15 @@
 import pygame
 from pygame.locals import *
-import state_main, state_house
+import state_main, state_house, state_options
 from button import Button
 
 
 class Menu:
-    def __init__(self, screen):
+    def __init__(self, screen, options):
         self.done = False
         self.nextstate = None
         self.screen = screen
+        self.options = options
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         BLACK = (0, 0, 0)
@@ -18,19 +19,21 @@ class Menu:
         playbutton = textfont.render("PLAY", True, BLACK, WHITE)
         optionsbutton = textfont.render("OPTIONS", True, BLACK, WHITE)
         quitbutton = textfont.render("QUIT", True, BLACK, WHITE)
-        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY - 150, playbutton, self.startgame),
-                        Button(screen, self.dimensionX / 2, self.dimensionY - 100, optionsbutton, self.enteroptions),
-                        Button(screen, self.dimensionX / 2, self.dimensionY - 50, quitbutton, quit)]
-        self.selectedbutton = -1
+        self.buttons = [Button(screen, self.dimensionX / 2, self.dimensionY/2 - 50, playbutton, self.startgame),
+                        Button(screen, self.dimensionX / 2, self.dimensionY/2, optionsbutton, self.enteroptions),
+                        Button(screen, self.dimensionX / 2, self.dimensionY/2 + 50, quitbutton, quit)]
+        self.selectedbutton = 0
         
     def startgame(self):
-        self.nextstate = state_house.HouseScreen(self.screen, 0)#state_main.Game(self.screen)
+        self.nextstate = state_main.Game(self.screen, self.options)
         self.done = True
     
     def enteroptions(self):
-        print("ENTERED OPTIONS MENU")
+        self.nextstate = state_options.Menu(self.screen, self.options, self, False)
+        self.done = True
     
     def main_loop(self):
+        self.done = False
         while not self.done:
             self.screen.fill((255, 255, 255))
             for i, b in enumerate(self.buttons):
