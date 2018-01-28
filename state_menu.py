@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import state_main, state_house, state_options
 from button import Button
-
+import threading
 
 class Menu:
     def __init__(self, screen, options):
@@ -12,6 +12,8 @@ class Menu:
         self.options = options
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
+        self.gamestate = None
+        self.game = None
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
         textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
@@ -23,9 +25,12 @@ class Menu:
                         Button(screen, self.dimensionX / 2, self.dimensionY/2, optionsbutton, self.enteroptions),
                         Button(screen, self.dimensionX / 2, self.dimensionY/2 + 50, quitbutton, quit)]
         self.selectedbutton = 0
-        
+    def load_game(self):
+        self.game = state_main.Game(self.screen, self.options)
     def startgame(self):
-        self.nextstate = state_main.Game(self.screen, self.options)
+        while self.game is None:
+            pygame.time.wait(30)
+        self.nextstate = self.game
         self.done = True
     
     def enteroptions(self):
@@ -34,6 +39,8 @@ class Menu:
     
     def main_loop(self):
         self.done = False
+        load_thread = threading.Thread(target=self.load_game)
+        load_thread.start()
         while not self.done:
             self.screen.fill((255, 255, 255))
             for i, b in enumerate(self.buttons):
