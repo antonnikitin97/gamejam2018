@@ -111,7 +111,7 @@ class Game:
                 self.map.blit(self.oceantile, (i, j))
         self.map.blit(self.islandmap, (self.oceanborderx, self.oceanbordery))
         self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
-                                            (int(898/5), int(876/5))).convert_alpha()
+                                            (int(898/2.5), int(876/2.5))).convert_alpha()
         self.tree = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Tree Translucent.png'),
                                            (int(2421/5), int(1977/5))).convert_alpha()
         self.grasses = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Grass {}.png'.format(i)),
@@ -166,9 +166,13 @@ class Game:
         self.house_list = sorted(self.house_list, key=lambda house: house.worldY)
         #print(self.house_list)
         self.house_states = []
-        self.house_assets = (pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'), (960, 720)).convert_alpha(), \
-            pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha(), pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'), \
-            (int(594/5), int(841/5))).convert_alpha(), pygame.image.load_extended('Assets\\Images\\symbutt.png'), pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30))
+        self.house_assets = (pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'),
+                                                    (960, 720)).convert_alpha(),
+                             pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha(),
+                             pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'),
+                                                    (int(594/5), int(841/5))).convert_alpha(),
+                             pygame.image.load_extended('Assets\\Images\\symbutt.png'),
+                             pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30))
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i], self.house_assets))
@@ -235,6 +239,9 @@ class Game:
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20,20))
 
+            playersprite = self.player.get_sprite()
+            self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
+                                            (self.dimensionY - playersprite.get_height())/2))
             housecollide = [-1, self.dimensionX]
             for i, house in enumerate(self.house_list):
                 house.visual.x = house.worldX - self.player.worldX + (self.dimensionX) / 2
@@ -251,13 +258,10 @@ class Game:
                 self.screen.blit(text_surface, (20, 20))
                 house = self.house_list[housecollide[0]]
                 arrowx = house.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width() + house.visual.width)/2
-                arrowy = house.worldY - self.player.worldY + 40 + (self.dimensionY - self.arrow.get_height() - house.visual.height)/2
+                arrowy = house.worldY - self.player.worldY + 100 + (self.dimensionY - self.arrow.get_height() - house.visual.height)/2
                 self.screen.blit(self.arrow, (arrowx, arrowy))
                 if pygame.key.get_pressed()[K_g]:
                     self.enterhouse(housecollide[0])
-            playersprite = self.player.get_sprite()
-            self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
-                                            (self.dimensionY - playersprite.get_height())/2))
             #self.screen.fill(0, self.player.visual)  # for debugging hitboxes
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
@@ -267,8 +271,8 @@ class Game:
             if len(broadcasting):
                 for house in broadcasting:
                     if distance(Point(house.worldX, house.worldY), Point(self.player.worldX, self.player.worldY)) + 300 < math.sqrt((self.dimensionX/2)**2 + (self.dimensionY/2)**2):
-                        self.screen.blit(self.broadcast, (house.worldX - self.player.worldX + (self.dimensionX + house.visual.width)/2 - 90, \
-                            house.worldY - self.player.worldY + 40 + (self.dimensionY - house.visual.height)/2 + 25))
+                        self.screen.blit(self.broadcast, (house.worldX - self.player.worldX + (self.dimensionX + house.visual.width)/2 - 106,
+                                                          house.worldY - self.player.worldY + 150 + (self.dimensionY - house.visual.height)/2 + 25))
                 #find nearest house
                 nearest = min(broadcasting, key = lambda h: distance(Point(h.worldX, h.worldY), Point(self.player.worldX, self.player.worldY)))
                 #find rotation
