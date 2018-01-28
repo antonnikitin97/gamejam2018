@@ -35,6 +35,12 @@ class Player:
     
     def get_sprite(self):
         return self.spritearray[self.orient][self.frame]
+
+    def add_transmission(self, dest, transmission):
+        if (dest, transmission) in self.current_transmissions:
+            return
+        else:
+            self.current_transmissions.append((dest, transmission))
     
     def move(self, pressed_keys, projected_box=None):
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
@@ -126,7 +132,7 @@ class Game:
 
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
-            self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i))
+            self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i]))
     
     def fire_transmission(self):
         self.initial = False
@@ -247,7 +253,3 @@ class Game:
             pygame.display.flip()
             pygame.time.wait(3)
         return self.nextstate
-
-#means you can run the whole thing from this file
-import StateMachine
-StateMachine.run()

@@ -4,6 +4,7 @@ import time
 import pygame
 import state_options
 import copy
+import button
 from pygame.locals import *
 
 TRANSMISSION_EVENT = 10000
@@ -13,11 +14,12 @@ noises = 0
 symbols = 0
 transmission_offset = 100
 class HouseScreen:
-    def __init__(self, screen, options, overworld, which):
+    def __init__(self, screen, options, overworld, which, which_obj):
         self.screen = screen
         self.options = options
         self.done = False
         self.house = which
+        self.house_obj = which_obj
         self.waiting_sounds = []
         self.current_channel = pygame.mixer.Channel(0)
         global noises
@@ -49,7 +51,10 @@ class HouseScreen:
         self.overworld = overworld
         self.player2 = copy.copy(overworld.player)
         self.is_bubble_displayed = 0
-
+        button_offset = 400
+        self.button_back = pygame.image.load_extended('Assets\\Images\\symbutt.png')
+        self.buttons = []
+        self.is_in_receive = False
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
 
@@ -89,17 +94,56 @@ class HouseScreen:
         #return [note_names[n % 12]+str(3 if n < 0 else (5 if n == 12 else 4)) for n in notes]
         return [n + 7 for n in notes]
 
+    def generate_offered_sequence(self, expected_transmission):
+        def get_options(given):
+            a, b = -1, -1
+            while True:
+                a, b = random.randint(0, 19), random.randint(0, 19)
+                if a == given or a == b or b == given:
+                    continue
+                break
+            print(a, b)
+            li = [a, b, given]
+            random.shuffle(li)
+            return li
+        return [get_options(e) for e in expected_transmission]
+    def start_delivering_transmission(self):       
+        #to deliver a transmission, the player is presented with 3 options
+        #each option has a symbol and a noise
+        #click the symbol to add it to the transmission
+        #then compare the two?
+        self.is_in_receive = True
+        expected_transmission = []
+        if self.house_obj.broadcast_status[1]:
+            expected_transmission = self.overworld.player.get_transmission(self.house)
+        else:
+            #no match, so give it at random
+            expected_transmission = self.music_seq(5)
+        print(expected_transmission)
+        offered_sequence = self.generate_offered_sequence(expected_transmission)
+        self.display_delivery_options(offered_sequence[0])
+        return offered_sequence[1:]
+
+    def display_delivery_options(self, options):
+        butts = []
+        for i in range(len(options)):
+            b1 = button.ButtonWithStuffOn(self.screen, int(i*self.overworld.dimensionX/3) + self.button_back.get_width()/2, 480, self.button_back, self.symbols[options[i]], self.noises[options[i]], lambda : print("fuck off"))
+            butts.append(b1)
+        self.buttons = butts
+        print('added butts')
+
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):
         while True:
             destination = random.randint(0, num_houses)
             if destination != from_id:
                 break
-        return self.get_location_encoding(destination) + self.music_seq(length)
+        return destination, self.get_location_encoding(destination) + self.music_seq(length)
 
     def start_receiving_transmission(self):
         #make a new transmission
-        transmission = self.make_transmission(self.house, 5)
+        dest, transmission = self.make_transmission(self.house, 5)
+        self.overworld.player.add_transmission(dest, transmission)
         print(transmission)
         #copy it over
         for note in transmission:
@@ -127,6 +171,7 @@ class HouseScreen:
     
     def leavehouse(self):
         self.nextstate = self.overworld
+        self.is_in_receive = False
         self.done = True
 
     def main_loop(self):
@@ -137,7 +182,8 @@ class HouseScreen:
         self.done = False
         while not self.done:
             pressed_keys = pygame.key.get_pressed()
-            self.player2.move(pressed_keys, self.bounding_collider)
+            if not self.is_in_receive:
+                self.player2.move(pressed_keys, self.bounding_collider)
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.map, (0, 0))
             self.screen.blit(self.router_birb, (transmission_offset + 480, transmission_offset + 180))
@@ -160,19 +206,25 @@ class HouseScreen:
                 if event.type == KEYDOWN:
                     if event.key == K_g:
                         if not len(self.waiting_sounds):
-                            if not self.transmission_received:
+                            if not self.transmission_received and self.house_obj.broadcast_status[0]:
                                 chan = self.start_receiving_transmission()
                             else:
                                 self.waiting_sounds = self.transmission.copy()
                                 self.transmission = []
                                 self.display_next_sequence()
+                    if event.key == K_d:
+                        self.current_delivery = self.start_delivering_transmission()
+                        if not self.house_obj.broadcast_status[1]:
+                            print('wrong house')
+                        else:
+                            print('right house')
                     if event.key == K_w:
                         self.leavehouse()
-                    if event.key == K_ESCAPE:
-                        self.enteroptions()
-
             while not self.current_channel.get_busy() and len(self.waiting_sounds):
                 #print('aaaaa')
                 self.display_next_sequence()
+            if self.is_in_receive:
+                for i, b in enumerate(self.buttons):
+                    b.show(0)
             pygame.display.flip()
         return self.nextstate
