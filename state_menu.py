@@ -28,6 +28,8 @@ class Menu:
     def load_game(self):
         self.game = state_main.Game(self.screen, self.options)
     def startgame(self):
+        self.screen.blit(pygame.font.Font('Assets\OpenSans-Regular.ttf', 30).render('Loading...', True, (0,0,0), (255, 255, 255)), (400, 600))
+        pygame.display.flip()
         while self.game is None:
             pygame.time.wait(30)
         self.nextstate = self.game

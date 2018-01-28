@@ -42,8 +42,10 @@ class Player:
         if (dest, transmission) in self.current_transmissions:
             return
         else:
-            self.current_transmissions.append((dest, transmission))
+            print(transmission)
+            self.current_transmissions.append((dest, transmission[2:]))
     def get_transmission(self, dest):
+        print(self.current_transmissions)
         for d in self.current_transmissions:
             if d[0] == dest:
                 return d[1]
@@ -172,7 +174,8 @@ class Game:
                              pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'),
                                                     (int(594/5), int(841/5))).convert_alpha(),
                              pygame.image.load_extended('Assets\\Images\\symbutt.png'),
-                             pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30))
+                             pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30), pygame.image.load_extended('Assets\\Images\\tick.png'),
+                             pygame.image.load_extended('Assets\\Images\\cross.png'))
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i], self.house_assets))

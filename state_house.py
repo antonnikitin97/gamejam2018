@@ -39,7 +39,7 @@ class HouseScreen:
         WHITE = (255, 255, 255)
         self.transmission = []
         self.transmission_received = False
-        self.map, self.bubble, self.router_birb, self.button_back, self.textfont = house_assets
+        self.map, self.bubble, self.router_birb, self.button_back, self.textfont, self.tick, self.cross = house_assets
         self.bounding_collider = pygame.Rect((200, 200, self.map.get_width() - 400, self.map.get_height() - 300))
         self.doormat_collider = pygame.Rect((300, 610, self.map.get_width() - 600, 20))
         self.overworld = overworld
@@ -112,18 +112,19 @@ class HouseScreen:
         expected_transmission = []
         if self.house_obj.broadcast_status[1]:
             expected_transmission = self.overworld.player.get_transmission(self.house)
+            print(len(expected_transmission))
         else:
             #no match, so give it at random
             expected_transmission = self.music_seq(5)
-        print(expected_transmission)
+        #print(expected_transmission)
         offered_sequence = self.generate_offered_sequence(expected_transmission)
-        print(offered_sequence)
+        #print(offered_sequence)
         self.display_delivery_options(offered_sequence[0])
         return offered_sequence[1:]
 
     def optionselected(self, id):
         self.currently_entered_sequence.append(id)
-        print(self.currently_entered_sequence)
+        #print(self.currently_entered_sequence)
         #should also add it to a big speech bubble thing
 
         if len(self.current_delivery) != 0:
@@ -131,7 +132,6 @@ class HouseScreen:
             self.display_delivery_options(next_entry)
         else:
             self.has_finished_inputting = True
-
 
         #todo: put 
     def display_delivery_options(self, options):
@@ -141,7 +141,7 @@ class HouseScreen:
                 self.noises[options[i]], self.optionselected, options[i])
             butts.append(b1)
         self.buttons = butts
-        print('added butts')
+        #print('added butts')
 
     #chooses a random house and makes a sequence of a given length along with a predefined header and end
     def make_transmission(self, from_id, length):
@@ -151,9 +151,21 @@ class HouseScreen:
                 break
         return destination, self.get_location_encoding(destination) + self.music_seq(length)
 
+    def mark_corrections(self):
+        #TODO: special notification if the house is totally wrong
+        offs = 0
+        for i, b in enumerate(self.currently_entered_sequence):
+            #for each symbol, if it matches then put a tick above it
+            #else put a cross
+            print(self.currently_entered_sequence, self.overworld.player.get_transmission(self.house))
+            mark = self.tick if b == self.overworld.player.get_transmission(self.house)[i] else self.cross
+            self.screen.blit(mark, (transmission_offset + offs + 10, transmission_offset + 50))
+            self.screen.blit(self.textfont.render("0/5 you're shit at this", True, (0, 0, 0), (255, 255, 255)), (300, 350))
+            offs += 155
     def start_receiving_transmission(self):
         #make a new transmission
         dest, transmission = self.make_transmission(self.house, 5)
+        print(transmission)
         self.overworld.player.add_transmission(dest, transmission)
         print(dest, len(self.overworld.house_list))
         self.overworld.house_list[dest].broadcast_status = (self.overworld.house_list[dest].broadcast_status[0], True)
@@ -244,8 +256,9 @@ class HouseScreen:
                 self.screen.blit(pygame.transform.flip(self.bubble, True, False), (transmission_offset - 30, transmission_offset - 90))
                 for i in range(len(self.currently_entered_sequence)):
                     thissymbol = self.symbols[self.currently_entered_sequence[i]]
-                    self.screen.blit(thissymbol, (transmission_offset + offs + 200, transmission_offset - 30))
-                    offs += thissymbol.get_width() + 5
-
+                    self.screen.blit(thissymbol, (transmission_offset + offs + 20, transmission_offset - 30))
+                    offs += 155
+            if self.has_finished_inputting:
+                self.mark_corrections()
             pygame.display.flip()
         return self.nextstate
