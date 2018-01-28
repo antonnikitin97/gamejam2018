@@ -3,6 +3,7 @@ from pygame.locals import *
 import state_gameover
 import state_house
 import state_options
+import state_journal
 from house import House
 from house_generator import *
 import time
@@ -11,8 +12,8 @@ from entity import Entity
 
 class Player:
     def __init__(self, dimensionX, dimensionY):
-        self.worldX = 1818
-        self.worldY = 1667
+        self.worldX = 3671
+        self.worldY = 2085
         self.screenX = dimensionX / 2
         self.screenY = dimensionY / 2
         self.speed = 10
@@ -212,6 +213,11 @@ class Game:
         self.done = True
         self.nextstate = state_options.Menu(self.screen, self.options, self)
         self.pause()
+    
+    def enterjournal(self):
+        self.done = True
+        self.nextstate = state_journal.Book(self.screen, self.options, self)
+        self.pause()
         
     def pause(self):
         self.options["TIME"] += time.time() - self.start
@@ -286,7 +292,7 @@ class Game:
 
                 #TODO: if any house on screen is broadcasting, don't show an arrow
             
-            scoretext = self.textfont.render("Score: " + str(self.options["DELIVERED"]),
+            scoretext = self.textfont.render("Score: {}/{}".format(self.options["DELIVERED"], self.options["TOTAL"]),
                                              True, BLACK, WHITE).convert_alpha()
             timetext = self.textfont.render("Time: {:0.2f}".format(self.options["TIME"] + (time.time() - self.start) * (not self.paused)),
                                             True, BLACK, WHITE).convert_alpha()
@@ -305,6 +311,8 @@ class Game:
                         self.endgame(True)
                     if event.key == K_ESCAPE:
                         self.enteroptions()
+                    if event.key == K_w:
+                        self.enterjournal()
                 if event.type == self.transmission_event:
                     print('THIS WORKED')
                     self.fire_transmission()
