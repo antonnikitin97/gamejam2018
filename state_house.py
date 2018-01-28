@@ -54,6 +54,7 @@ class HouseScreen:
         button_offset = 400
         self.button_back = pygame.image.load_extended('Assets\\Images\\symbutt.png')
         self.buttons = []
+        self.currently_entered_sequence = []
         self.is_in_receive = False
     def load_bird_noises(self):
         return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(21)]
@@ -98,7 +99,7 @@ class HouseScreen:
         def get_options(given):
             a, b = -1, -1
             while True:
-                a, b = random.randint(0, 19), random.randint(0, 19)
+                a, b = random.randint(0, 18), random.randint(0, 18)
                 if a == given or a == b or b == given:
                     continue
                 break
@@ -121,13 +122,27 @@ class HouseScreen:
             expected_transmission = self.music_seq(5)
         print(expected_transmission)
         offered_sequence = self.generate_offered_sequence(expected_transmission)
+        print(offered_sequence)
         self.display_delivery_options(offered_sequence[0])
         return offered_sequence[1:]
 
+    def optionselected(self, id):
+        self.currently_entered_sequence.append(id)
+        print(self.currently_entered_sequence)
+
+        if len(self.current_delivery) != 0:
+            next_entry = self.current_delivery.pop(0)
+            self.display_delivery_options(next_entry)
+        else:
+            self.is_in_receive = False
+
+
+        #todo: put 
     def display_delivery_options(self, options):
         butts = []
         for i in range(len(options)):
-            b1 = button.ButtonWithStuffOn(self.screen, int(i*self.overworld.dimensionX/3) + self.button_back.get_width()/2, 480, self.button_back, self.symbols[options[i]], self.noises[options[i]], lambda : print("fuck off"))
+            b1 = button.ButtonWithStuffOn(self.screen, int(i*self.overworld.dimensionX/3) + self.button_back.get_width()/2, 480, self.button_back, self.symbols[options[i]], \
+                self.noises[options[i]], self.optionselected, i)
             butts.append(b1)
         self.buttons = butts
         print('added butts')
@@ -173,6 +188,7 @@ class HouseScreen:
     def leavehouse(self):
         self.nextstate = self.overworld
         self.is_in_receive = False
+        self.currently_entered_sequence = []
         self.done = True
 
     def main_loop(self):
@@ -207,13 +223,13 @@ class HouseScreen:
                 if event.type == KEYDOWN:
                     if event.key == K_g:
                         if not len(self.waiting_sounds):
-                            if not self.transmission_received and self.house_obj.broadcast_status[0]:
+                            if not self.transmission_received and self.house_obj.broadcast_status[0] and not self.is_in_receive:
                                 chan = self.start_receiving_transmission()
                             else:
                                 self.waiting_sounds = self.transmission.copy()
                                 self.transmission = []
                                 self.display_next_sequence()
-                    if event.key == K_d:
+                    if event.key == K_d and not self.current_channel.get_busy():
                         self.current_delivery = self.start_delivering_transmission()
                         if not self.house_obj.broadcast_status[1]:
                             print('wrong house')
@@ -227,5 +243,6 @@ class HouseScreen:
             if self.is_in_receive:
                 for i, b in enumerate(self.buttons):
                     b.show(0)
+
             pygame.display.flip()
         return self.nextstate
