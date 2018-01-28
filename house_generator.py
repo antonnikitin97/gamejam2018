@@ -45,6 +45,7 @@ def play_music(music_file):
         clock.tick(50)
 
 def generate_house_locations(housesprite, islecentrex, islecentrey, islerad, n_houses=20):
+    islerad = int(islerad)
     min_house_dist = max(housesprite.get_width(), housesprite.get_height())
     list_houses = []
     for i in range(n_houses):

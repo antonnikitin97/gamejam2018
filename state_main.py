@@ -114,12 +114,9 @@ class Game:
                 self.map.blit(self.oceantile, (i, j))
         self.map.blit(self.islandmap, (self.oceanborderx, self.oceanbordery))
         self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
-                                            (int(898/2.5), int(876/2.5))).convert_alpha()
+                                            (int(860/2), int(878/2))).convert_alpha()
         self.tree = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Tree Translucent.png'),
                                            (int(2421/5), int(1977/5))).convert_alpha()
-        self.grasses = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Grass {}.png'.format(i)),
-                                               (100, 100)).convert_alpha()
-                        for i in range(1, 4)]
         self.player = Player(self.dimensionX, self.dimensionY)
         self.player.worldX += self.oceanborderx
         self.player.worldY += self.oceanbordery
@@ -139,6 +136,7 @@ class Game:
         pygame.time.set_timer(self.transmission_event, self.transmission_time * 1000)
         self.start = 0
         self.paused = False
+        self.journalstate = state_journal.Book(self.screen, self.options, self, self.map, self.house_list)
         
     def rotatePoint(self, centerPoint, point, angle):
         """Rotates a point around another centerPoint. Angle is in degrees.
@@ -150,17 +148,10 @@ class Game:
         return temp_point
 
     def generate_terrain(self):
-        # Grass
-        for i in range(3):
-            for pos in generate_house_locations(self.grasses[i],
-                                                self.map.get_width() / 2, self.map.get_height() / 2,
-                                                min(self.islandmap.get_width(), self.islandmap.get_height()) / 2,
-                                                30):
-                self.map.blit(self.grasses[i], (pos.x, pos.y))
         # Houses
         valid_points = generate_house_locations(self.house,
                                                 self.map.get_width() / 2, self.map.get_height() / 2,
-                                                min(self.islandmap.get_width(), self.islandmap.get_height()) / 2,
+                                                min(self.islandmap.get_width(), self.islandmap.get_height()) / 2 - 400,
                                                 10)
         for i, house in enumerate(valid_points):
             tuple = (house.x, house.y)
@@ -170,7 +161,7 @@ class Game:
         #print(self.house_list)
         self.house_states = []
         self.house_assets = (pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'),
-                                                    (960, 720)).convert_alpha(),
+                                                    (int(1045 * 0.9), int(888 * 0.9))).convert_alpha(),
                              pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha(),
                              pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'),
                                                     (int(594/5), int(841/5))).convert_alpha(),
@@ -216,7 +207,7 @@ class Game:
     
     def enterjournal(self):
         self.done = True
-        self.nextstate = state_journal.Book(self.screen, self.options, self)
+        self.nextstate = self.journalstate
         self.pause()
         
     def pause(self):
@@ -242,15 +233,37 @@ class Game:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, ((self.dimensionX / 2) - self.player.worldX,
                                         (self.dimensionY / 2) - self.player.worldY))
-            
+                   
             if not self.islandrect.colliderect(self.player.collision):
                 self.danger = True
                 text_surface = self.textfont.render('DANGER!', False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20,20))
 
-            playersprite = self.player.get_sprite()
-            self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
-                                            (self.dimensionY - playersprite.get_height())/2))
+            # if we have transmissions, add an arrow
+            broadcasting = [i for i in self.house_list if i.broadcast_status[0]]
+            if len(broadcasting):
+                for house in broadcasting:
+                    if distance(Point(house.worldX, house.worldY),
+                                Point(self.player.worldX, self.player.worldY)) + 300 < math.sqrt(
+                            (self.dimensionX / 2) ** 2 + (self.dimensionY / 2) ** 2):
+                        self.screen.blit(self.broadcast, (
+                        house.worldX - self.player.worldX + (self.dimensionX + house.visual.width) / 2 - 109,
+                        house.worldY - self.player.worldY + 150 + (self.dimensionY - house.visual.height) / 2 + 65))
+                # find nearest house
+                nearest = min(broadcasting, key=lambda h: distance(Point(h.worldX, h.worldY),
+                                                                   Point(self.player.worldX, self.player.worldY)))
+                # find rotation
+                rot = -math.degrees(
+                    math.atan2(nearest.worldY - self.player.worldY, nearest.worldX - self.player.worldX)) % 360
+                if distance(Point(nearest.worldX, nearest.worldY),
+                            Point(self.player.worldX, self.player.worldY)) + 300 > math.sqrt(
+                        (self.dimensionX / 2) ** 2 + (self.dimensionY / 2) ** 2):
+                    self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90).convert_alpha(),
+                                     self.rotatePoint((self.dimensionX / 2, self.dimensionY / 2),
+                                                      (int(self.dimensionX / 2) - 50, 100), - rot + 90))
+
+                # TODO: if any house on screen is broadcasting, don't show an arrow
+
             housecollide = [-1, self.dimensionX]
             for i, house in enumerate(self.house_list):
                 house.visual.x = house.worldX - self.player.worldX + (self.dimensionX) / 2
@@ -262,40 +275,33 @@ class Game:
                     if housecollide[1] > d:
                         housecollide = [i, d]
             if housecollide[0] != -1:
+                house = self.house_list[housecollide[0]]
+                arrowx = house.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width() + house.visual.width)/2
+                arrowy = house.worldY - self.player.worldY - 50 + (self.dimensionY - self.arrow.get_height())/2
+                numberarrow = self.arrow.copy()
+                number = self.textfont.render(str(housecollide[0]), True, BLACK).convert_alpha()
+                numberarrow.blit(number, ((self.arrow.get_width() - number.get_width())/2 + 5,
+                                          (self.arrow.get_height() - number.get_height())/2))
+                self.screen.blit(numberarrow, (arrowx, arrowy))
+                if pygame.key.get_pressed()[K_g]:
+                    self.enterhouse(housecollide[0])
                 text_surface = self.textfont.render('Press G to enter house {}'.format(housecollide[0]),
                                                     False, WHITE, BLACK).convert_alpha()
                 self.screen.blit(text_surface, (20, 20))
-                house = self.house_list[housecollide[0]]
-                arrowx = house.worldX - self.player.worldX + (self.dimensionX - self.arrow.get_width() + house.visual.width)/2
-                arrowy = house.worldY - self.player.worldY + 100 + (self.dimensionY - self.arrow.get_height() - house.visual.height)/2
-                self.screen.blit(self.arrow, (arrowx, arrowy))
-                if pygame.key.get_pressed()[K_g]:
-                    self.enterhouse(housecollide[0])
             #self.screen.fill(0, self.player.visual)  # for debugging hitboxes
             pressed_keys = pygame.key.get_pressed()
             self.player.move(pressed_keys)
-
-            #if we have transmissions, add an arrow
-            broadcasting = [i for i in self.house_list if i.broadcast_status[0]]
-            if len(broadcasting):
-                for house in broadcasting:
-                    if distance(Point(house.worldX, house.worldY), Point(self.player.worldX, self.player.worldY)) + 300 < math.sqrt((self.dimensionX/2)**2 + (self.dimensionY/2)**2):
-                        self.screen.blit(self.broadcast, (house.worldX - self.player.worldX + (self.dimensionX + house.visual.width)/2 - 106,
-                                                          house.worldY - self.player.worldY + 150 + (self.dimensionY - house.visual.height)/2 + 25))
-                #find nearest house
-                nearest = min(broadcasting, key = lambda h: distance(Point(h.worldX, h.worldY), Point(self.player.worldX, self.player.worldY)))
-                #find rotation
-                rot = -math.degrees(math.atan2(nearest.worldY - self.player.worldY, nearest.worldX - self.player.worldX)) % 360
-                if distance(Point(nearest.worldX, nearest.worldY), Point(self.player.worldX, self.player.worldY)) + 300 > math.sqrt((self.dimensionX/2)**2 + (self.dimensionY/2)**2):
-                    self.screen.blit(pygame.transform.rotate(self.arrow2, rot + 90).convert_alpha(),
-                                     self.rotatePoint((self.dimensionX/2, self.dimensionY/2), (int(self.dimensionX/2)-50, 100), -rot + 90))
-
-                #TODO: if any house on screen is broadcasting, don't show an arrow
             
+            playersprite = self.player.get_sprite()
+            self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
+                                            (self.dimensionY - playersprite.get_height())/2))
+            
+            scoretext = self.textfont.render("Score: {}/{}".format(self.options["DELIVERED"], self.options["TOTAL"]),
+                                             True, BLACK, WHITE).convert_alpha()
             scoretext = self.textfont.render("Score: " + str(self.options["TOTAL"]), True, BLACK, WHITE).convert_alpha()
             scoretext2 = self.textfont.render("Delivered: {}/{}".format(self.options["DELIVERED"], self.options["OUT_OF"]), True, BLACK, WHITE).convert_alpha()
             scoretext3 = self.textfont.render("Accuracy: {0:.0f}%".format(self.options["CORRECT_SYM"]*100/(self.options["TOTAL_SYM"] \
-             if self.options["TOTAL_SYM"] != 0 else 1)), True, BLACK, WHITE).convert_alpha()                  
+             if self.options["TOTAL_SYM"] != 0 else 1)), True, BLACK, WHITE).convert_alpha()
             timetext = self.textfont.render("Time: {:0.2f}".format(self.options["TIME"] + (time.time() - self.start) * (not self.paused)),
                                             True, BLACK, WHITE).convert_alpha()
             self.screen.blit(scoretext, (self.dimensionX - scoretext.get_width() - 5, 5))
