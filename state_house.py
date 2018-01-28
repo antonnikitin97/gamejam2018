@@ -160,6 +160,8 @@ class HouseScreen:
                 #update the score - minus 5000 points?
                 self.overworld.options["TOTAL"] -= 5000
                 self.overworld.options["WRONG"] += 1
+                self.overworld.options["OUT_OF"] += 1
+                self.overworld.options["TOTAL_SYM"] += 5
             self.is_in_receive = False
             return
         offs = 0
@@ -175,7 +177,13 @@ class HouseScreen:
                 correct +=1
         if self.is_in_receive:
             self.overworld.options["TOTAL"] += (1000*correct)
+            self.overworld.options["TOTAL"] -= (500*(5-correct))
             self.overworld.options["TOTAL"] += (3000 if correct == 5 else 0)
+            if correct != 0:
+                self.overworld.options["DELIVERED"] += 1
+            self.overworld.options["OUT_OF"] += 1
+            self.overworld.options["TOTAL_SYM"] += 5
+            self.overworld.options["CORRECT_SYM"] += correct
         self.is_in_receive = False
 
     def start_receiving_transmission(self):

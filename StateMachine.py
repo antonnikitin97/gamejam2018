@@ -35,6 +35,9 @@ def run():
                       "TOTAL": 0,     # number of packets given
                       "DELIVERED": 0, # number delivered correctly
                       "TIME": 0,
+                      "OUT_OF": 0,
+                      "CORRECT_SYM": 0,
+                      "TOTAL_SYM": 0,
                       "WRONG" : 0}      # time taken to do so
     menustate = state_menu.Menu(screen, initialoptions)
     state = menustate
