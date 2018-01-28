@@ -321,7 +321,7 @@ class Game:
                         self.endgame(True)
                     if event.key == K_ESCAPE:
                         self.enteroptions()
-                    if event.key == K_w:
+                    if event.key == K_j:
                         self.enterjournal()
                 if event.type == self.transmission_event:
                     #print('THIS WORKED')
