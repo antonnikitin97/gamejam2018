@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import state_main, state_house, state_options, state_instr
 from button import Button
+import os
 
 class Menu:
     def __init__(self, screen, options):
@@ -17,7 +18,7 @@ class Menu:
         self.game = None
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
-        textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
+        textfont = pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30)
         # Standin for buttons as they come
         playbutton = textfont.render("PLAY", True, BLACK, WHITE)
         instrbutton = textfont.render("INSTRUCTIONS", True, BLACK, WHITE)
@@ -30,21 +31,21 @@ class Menu:
         self.selectedbutton = 0
     def load_game(self):
         self.game = state_main.Game(self.screen, self.options)
-        
+
     def startgame(self):
-        self.screen.blit(pygame.font.Font('Assets\OpenSans-Regular.ttf', 30).render('Loading...', True, (0,0,0), (255, 255, 255)), (400, 600))
+        self.screen.blit(pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30).render('Loading...', True, (0,0,0), (255, 255, 255)), (400, 600))
         pygame.display.flip()
         self.load_game()
         self.nextstate = self.game
         self.done = True
-    
+
     def enteroptions(self):
         self.nextstate = state_options.Menu(self.screen, self.options, self, False)
         self.done = True
     def instructions(self):
         self.nextstate = state_instr.Instr(self.screen, self)
         self.done = True
-    
+
     def main_loop(self):
         self.done = False
         while not self.done:

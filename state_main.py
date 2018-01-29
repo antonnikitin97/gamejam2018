@@ -8,6 +8,7 @@ from house import House
 from house_generator import *
 import time
 import math
+import os
 from entity import Entity
 
 class Dude:
@@ -16,12 +17,12 @@ class Dude:
         self.worldY = py
         self.speed = 10
         self.orient = 0
-        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Guy Frame {}.png'.format(i)).convert_alpha(),
+        img = [pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Guy Frame {}.png'.format(i))).convert_alpha(),
                                       (204, 152)) for i in range(1, 5)]
         self.spritearray = [img]
         self.frame = random.randint(0, 4)
         self.lastspritechangetime = 0
-    
+
     def get_sprite(self):
         return self.spritearray[self.orient][self.frame]
 
@@ -40,7 +41,7 @@ class Player:
         self.screenY = dimensionY / 2
         self.speed = 10
         self.orient = 0
-        img = [pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Bird Frame {}.png'.format(i)).convert_alpha(),
+        img = [pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Bird Frame {}.png'.format(i))).convert_alpha(),
                                       (204, 152)) for i in range(1, 6)]
         down_img = [pygame.transform.rotate(img[i], 90).convert_alpha() for i in range(len(img))]
         right_img = [pygame.transform.flip(img[i], True, False).convert_alpha() for i in range(len(img))]
@@ -57,7 +58,7 @@ class Player:
         self.collision = pygame.Rect((self.worldX - 76, self.worldY - 76, 152, 152))
         self.projected_collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
         self.current_transmissions = []
-    
+
     def get_sprite(self):
         return self.spritearray[self.orient][self.frame]
 
@@ -79,7 +80,7 @@ class Player:
                 del d
                 return
 
-    
+
     def move(self, pressed_keys, projected_box=None):
         self.collision = pygame.Rect((self.worldX, self.worldY, 204, 152))
         xdiff = 0
@@ -130,8 +131,8 @@ class Game:
         self.dimensionX = screen.get_width()
         self.dimensionY = screen.get_height()
         self.screen_dimensions = (self.dimensionX, self.dimensionY)
-        self.islandmap = pygame.image.load_extended('Assets\Images\WorldMap.png').convert_alpha()
-        self.oceantile = pygame.image.load_extended('Assets\Images\WavesSolo.png').convert_alpha()
+        self.islandmap = pygame.image.load_extended(os.path.join('Assets','Images','WorldMap.png')).convert_alpha()
+        self.oceantile = pygame.image.load_extended(os.path.join('Assets','Images','WavesSolo.png')).convert_alpha()
         self.oceanborderx = 1035
         self.oceanbordery = 987
         self.dudes = [Dude(random.randint(1035, self.islandmap.get_width()-1035), random.randint(987, self.islandmap.get_width()-987)) for _ in range(20)]
@@ -144,9 +145,9 @@ class Game:
             for j in range(0, self.map.get_height(), self.oceantile.get_height()):
                 self.map.blit(self.oceantile, (i, j))
         self.map.blit(self.islandmap, (self.oceanborderx, self.oceanbordery))
-        self.house = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Exterior.png'),
+        self.house = pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Exterior.png')),
                                             (int(860/2), int(878/2))).convert_alpha()
-        self.tree = pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Tree Translucent.png'),
+        self.tree = pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Tree Translucent.png')),
                                            (int(2421/5), int(1977/5))).convert_alpha()
         self.player = Player(self.dimensionX, self.dimensionY)
         self.player.worldX += self.oceanborderx
@@ -154,11 +155,11 @@ class Game:
         self.house_list = []
         self.house_states = []
         self.generate_terrain()
-        self.textfont = pygame.font.Font('Assets/OpenSans-Regular.ttf', 30)
-        self.arrow = pygame.image.load_extended('Assets\\Images\\arrow.png').convert_alpha()
-        self.arrow2 = pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\arrow2.png'),
+        self.textfont = pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30)
+        self.arrow = pygame.image.load_extended(os.path.join('Assets','Images','arrow.png')).convert_alpha()
+        self.arrow2 = pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','GameJam','arrow2.png')),
                                              (100, 100)).convert_alpha()
-        self.broadcast = pygame.transform.scale(pygame.image.load_extended('Assets\\broadcast.png'),
+        self.broadcast = pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','broadcast.png')),
                                                 (int(417/2.5), int(188/2.5))).convert_alpha()
         self.danger = False
         self.transmission_time = 30
@@ -167,7 +168,7 @@ class Game:
         pygame.time.set_timer(self.transmission_event, self.transmission_time * 1000)
         self.start = 0
         self.paused = False
-        
+
     def rotatePoint(self, centerPoint, point, angle):
         """Rotates a point around another centerPoint. Angle is in degrees.
         Rotation is counter-clockwise"""
@@ -190,14 +191,14 @@ class Game:
         self.house_list = sorted(self.house_list, key=lambda house: house.worldY)
         #print(self.house_list)
         self.house_states = []
-        self.house_assets = (pygame.transform.scale(pygame.image.load_extended('Assets\\Images\\Interior2.png'),
+        self.house_assets = (pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','Images','Interior2.png')),
                                                     (int(1045 * 0.9), int(888 * 0.9))).convert_alpha(),
-                             pygame.image.load_extended('Assets\\GameJam\\speech.png').convert_alpha(),
-                             pygame.transform.scale(pygame.image.load_extended('Assets\\GameJam\\robobirb.png'),
+                             pygame.image.load_extended(os.path.join('Assets','GameJam','speech.png')).convert_alpha(),
+                             pygame.transform.scale(pygame.image.load_extended(os.path.join('Assets','GameJam','robobirb.png')),
                                                     (int(594/5), int(841/5))).convert_alpha(),
-                             pygame.image.load_extended('Assets\\Images\\symbutt.png'),
-                             pygame.font.Font('Assets\\OpenSans-Regular.ttf', 30), pygame.image.load_extended('Assets\\Images\\tick.png'),
-                             pygame.image.load_extended('Assets\\Images\\cross.png'))
+                             pygame.image.load_extended(os.path.join('Assets','Images','symbutt.png')),
+                             pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30), pygame.image.load_extended(os.path.join('Assets','Images','tick.png')),
+                             pygame.image.load_extended(os.path.join('Assets','Images','cross.png')))
         for i, house in enumerate(self.house_list):
             self.map.blit(self.house, (house.worldX, house.worldY))
             self.house_states.append(state_house.HouseScreen(self.screen, self.options, self, i, self.house_list[i], self.house_assets))
@@ -206,7 +207,7 @@ class Game:
                                                        self.islandmap.get_height() * 0.3 + self.oceanbordery,
                                             self.islandmap.get_height() * 0.3, 3):
             self.map.blit(self.tree, (pos.x, pos.y))
-    
+
     def fire_transmission(self):
         self.initial = False
         #print('fired')
@@ -219,33 +220,33 @@ class Game:
             break
         curr_house_pick.broadcast_status = (True, curr_house_pick.broadcast_status[1])
         #set it to be currently broadcasting
-    
+
     def endgame(self, victory):
         self.pause()
         self.nextstate = state_gameover.EndScreen(self.screen, self.options, victory)
         self.done = True
-    
+
     def enterhouse(self, which):
         self.done = True
         #print("Entered house", which)
         self.pause()
         self.nextstate = self.house_states[which]
-    
+
     def enteroptions(self):
         self.done = True
         self.pause()
         self.nextstate = state_options.Menu(self.screen, self.options, self)
-    
+
     def enterjournal(self):
         self.done = True
         self.nextstate = state_journal.Book(self.screen, self.options, self, self.map, self.house_list, self.player)
         self.pause()
-        
+
     def pause(self):
         self.options["TIME"] += time.time() - self.start
         #print("Timer paused at", self.options["TIME"])
         self.paused = True
-    
+
     def unpause(self):
         self.start = time.time()
         #print("Timer unpaused at", self.options["TIME"])
@@ -264,7 +265,7 @@ class Game:
             self.screen.fill((38, 142, 143))
             self.screen.blit(self.map, ((self.dimensionX / 2) - self.player.worldX,
                                         (self.dimensionY / 2) - self.player.worldY))
-                   
+
             if not self.islandrect.colliderect(self.player.collision):
                 self.danger = True
                 self.danger_time += 10
@@ -334,8 +335,8 @@ class Game:
             playersprite = self.player.get_sprite()
             self.screen.blit(playersprite, ((self.dimensionX - playersprite.get_width())/2,
                                             (self.dimensionY - playersprite.get_height())/2))
-            
-            
+
+
             scoretext = self.textfont.render("Score: " + str(self.options["TOTAL"]), True, BLACK, WHITE).convert_alpha()
             scoretext2 = self.textfont.render("Delivered: {}/{}".format(self.options["DELIVERED"], self.options["OUT_OF"]), True, BLACK, WHITE).convert_alpha()
             scoretext3 = self.textfont.render("Accuracy: {0:.0f}%".format(self.options["CORRECT_SYM"]*100/(self.options["TOTAL_SYM"] \
@@ -347,10 +348,10 @@ class Game:
             self.screen.blit(scoretext2, (self.dimensionX - scoretext2.get_width() - 5, 40))
             self.screen.blit(scoretext3, (self.dimensionX - scoretext2.get_width() - 5, 75))
             self.screen.blit(timetext, (self.dimensionX - timetext.get_width() - 5, 115))
-            
+
             if self.options["OUT_OF"] == 5:
                 self.endgame(True)
-            
+
             for event in pygame.event.get():
                 if event.type == QUIT:
                     quit()

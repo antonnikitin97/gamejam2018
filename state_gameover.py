@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import state_main, state_menu
 from button import Button
+import os
 
 
 class EndScreen:
@@ -16,8 +17,8 @@ class EndScreen:
         self.victory = victory
         BLACK = (0, 0, 0)
         WHITE = (255, 255, 255)
-        textfont = pygame.font.Font('Assets\OpenSans-Regular.ttf', 30)
-        self.stamp = pygame.image.load_extended('Assets/Images/Bird standing.png')  # Standin image
+        textfont = pygame.font.Font(os.path.join('Assets','OpenSans-Regular.ttf'), 30)
+        self.stamp = pygame.image.load_extended(os.path.join('Assets','Images','Bird standing.png'))  # Standin image
         self.scorestatement = [textfont.render(endtext, True, BLACK, WHITE),
                                textfont.render("{}/{} Symbols delivered correctly".format(self.options["CORRECT_SYM"],
                                                                                           self.options["TOTAL_SYM"]),
@@ -32,15 +33,15 @@ class EndScreen:
                         Button(screen, int(self.dimensionX * 0.6), int(self.dimensionY*0.75 - 100), menubutton, self.tomenu),
                         Button(screen, int(self.dimensionX * 0.6), int(self.dimensionY*0.75 - 50), quitbutton, quit)]
         self.selectedbutton = -1
-    
+
     def startgame(self):
         self.nextstate = state_main.Game(self.screen, self.options)
         self.done = True
-    
+
     def tomenu(self):
         self.nextstate = state_menu.Menu(self.screen, self.options)
         self.done = True
-    
+
     def main_loop(self):
         while not self.done:
             self.screen.fill((255, 255, 255))

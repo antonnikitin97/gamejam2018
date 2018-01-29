@@ -2,6 +2,7 @@ from math import sqrt
 from random import randint
 import random
 import pygame
+import os
 import time, numpy, pygame.mixer, pygame.sndarray
 
 class Point:
@@ -85,7 +86,7 @@ def music_seq(length):
 	#A-G = 0-7
 	note_names = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 	start = random.randint(0, 12)
-	
+
 	curr_offset = start
 	notes = [start]
 	for i in range(length):
@@ -104,7 +105,7 @@ def music_seq(length):
 	#return [note_names[n % 12]+str(3 if n < 0 else (5 if n == 12 else 4)) for n in notes]
 	return [n+7 for n in notes]
 def load_bird_noises():
-	return [pygame.mixer.Sound("Assets\\Audio\\bird" + str(i) + ".wav") for i in range(16)]
+	return [pygame.mixer.Sound(os.path.join("Assets","Audio","bird" + str(i) + ".wav")) for i in range(16)]
 
 if __name__ == "__main__":
 	#generate_house_locations()
@@ -119,7 +120,7 @@ if __name__ == "__main__":
 	# optional volume 0 to 1.0
 	#music_file = "demo.mid"
 	#pygame.mixer.music.set_volume(0.8)
-	
+
 	#try:
 	#    play_music(music_file)
 	#except KeyboardInterrupt:
@@ -148,7 +149,7 @@ if __name__ == "__main__":
 
 	# load the sound into an array
 	snd_array = pygame.sndarray.array(sound)
-	
+
 	# resample. args: (target array, ratio, mode), outputs ratio * target array.
 	# this outputs a bunch of garbage and I don't know why.
 	sounds = []
